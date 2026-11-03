@@ -28,3 +28,5 @@
 
 .mobile-workspace-nav{display:none}
 @media(max-width:850px){.mobile-workspace-nav{display:flex;gap:6px;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.07);background:#111d2c;overflow-x:auto}.mobile-workspace-nav button{display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex:1;min-width:max-content;padding:9px 11px;border:1px solid transparent;border-radius:7px;background:transparent;color:#8fa0b2;font-size:10px}.mobile-workspace-nav button.active{color:var(--mint);background:rgba(115,240,194,.08);border-color:rgba(115,240,194,.15)}}
+
+.company-brief{height:auto;min-height:104px;padding-top:11px;resize:vertical;line-height:1.6}
