@@ -235,12 +235,13 @@ function Scene({ projects, selectedProjectId, selectedFilePath, onSelect, onSele
   const rows = Math.max(1, Math.ceil(visible.length / columns));
   const width = columns * 28 + 20;
   const depth = rows * 28 + 20;
+  const trafficLane = (Math.floor(rows / 2) - rows / 2) * 28;
   const people = useMemo(() => Array.from({ length: 8 }, (_, i) => ({
-    start: [-width / 2 + 1, 0, -depth / 2 + 1 + (i % 4) * 0.45] as [number, number, number],
-    end: [width / 2 - 1, 0, -depth / 2 + 1 + (i % 4) * 0.45] as [number, number, number],
+    start: [-width / 2 + 1, 0, trafficLane + (i % 4 - 1.5) * 0.48] as [number, number, number],
+    end: [width / 2 - 1, 0, trafficLane + (i % 4 - 1.5) * 0.48] as [number, number, number],
     color: ["#D17C60", "#6C8EAB", "#B18A55", "#8975A8"][i % 4],
     delay: i / 8,
-  })), [width, depth]);
+  })), [width, trafficLane]);
   return <>
     <color attach="background" args={["#C7E2E9"]} />
     <fog attach="fog" args={["#C7E2E9", 85, 180]} />
@@ -251,8 +252,8 @@ function Scene({ projects, selectedProjectId, selectedFilePath, onSelect, onSele
     <RoadNetwork columns={columns} rows={rows} />
     {visible.map((project, index) => <District key={project.id} project={project} index={index} columns={columns} total={visible.length} selectedProjectId={selectedProjectId} selectedFilePath={selectedFilePath} onSelect={onSelect} onSelectFile={onSelectFile} />)}
     {people.map((person, index) => <Person key={index} {...person} />)}
-    <TrafficCar lane={-1.0} color="#E1A45E" delay={0.06} />
-    <TrafficCar lane={1.0} color="#7798B4" delay={0.52} reverse />
+    <TrafficCar lane={trafficLane - 0.72} color="#E1A45E" delay={0.06} />
+    <TrafficCar lane={trafficLane + 0.72} color="#7798B4" delay={0.52} reverse />
     <OrbitControls makeDefault target={[0, 0, 0]} minDistance={19} maxDistance={Math.max(120, Math.max(columns, rows) * 100)} minPolarAngle={0.55} maxPolarAngle={1.22} enableDamping dampingFactor={0.08} rotateSpeed={0.55} panSpeed={0.75} zoomSpeed={0.8} />
   </>;
 }
