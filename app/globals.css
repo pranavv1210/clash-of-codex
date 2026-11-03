@@ -105,3 +105,15 @@
   .workspace-scroll:has(.city-board) .mobile-workspace-nav button{flex:none;min-width:0;padding:7px 8px;font-size:8px}
   .workspace-scroll:has(.city-board) .mobile-workspace-nav button svg{width:12px;height:12px}
 }
+
+/* Keep the non-map workspace tabs scrollable after the immersive city layout. */
+@media(min-width:851px){
+  .workspace .main-workspace>.workspace-scroll{flex:1;min-height:0;overflow-y:auto}
+  .workspace-scroll:not(:has(.city-board)){padding-top:70px}
+}
+@media(max-width:850px){
+  .workspace .main-workspace>.workspace-scroll{flex:1;min-height:0;overflow-y:auto}
+  .workspace-scroll:not(:has(.city-board)){padding-top:60px}
+  .workspace .main-workspace:has(.city-board)>.workspace-top{display:none}
+  .workspace-scroll:has(.city-board) .overview-lower{bottom:150px}
+}

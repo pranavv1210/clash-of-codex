@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
-import { formatNumber, getFileContent, getRepoSnapshot, getUserRepos } from "@/lib/github";
+import { formatNumber, getFileContent, getFileLanguage, getRepoSnapshot, getUserRepos } from "@/lib/github";
 import type { GitHubRepo, Mission, Project, RepoFile } from "@/types/inceptown";
 
 const CityScene = dynamic(() => import("@/components/CityScene"), { ssr: false, loading: () => <div className="scene-loading"><LoaderCircle className="spin" /> Preparing your city…</div> });
@@ -125,7 +125,7 @@ export default function InceptownApp() {
 
   const selectedProject = selectedProjectId ? projects.find((project) => project.id === selectedProjectId) : undefined;
   const floors = useMemo(() => selectedProject ? getFloors(selectedProject.files) : [], [selectedProject]);
-  const allLanguages = useMemo(() => [...new Set(projects.map((project) => project.language).filter(Boolean))], [projects]);
+  const allLanguages = useMemo(() => [...new Set(allFiles.filter((file) => file.type === "blob").map((file) => getFileLanguage(file.path)).filter((language): language is string => Boolean(language)))], [allFiles]);
   const stages = ["Surveying the land", "Mapping the streets", "Raising company towers", "Opening the city gates"];
 
   useEffect(() => {
@@ -487,7 +487,7 @@ export default function InceptownApp() {
             </nav>
             <div className="workspace-scroll">
               <div className="city-heading"><div><span className="section-kicker">YOUR STARTUP CITY</span>{editingCity ? <form className="rename-form" onSubmit={(e) => { e.preventDefault(); setEditingCity(false); }}><input value={cityName} onChange={(e) => setCityName(e.target.value)} autoFocus /><button className="mini-save"><Check size={14} /></button></form> : <h1>{cityName}</h1>}<p>A living map of <strong>{selectedRepo.full_name}</strong>. Explore a company to see what&apos;s inside.</p></div><button className="button button-outline small" onClick={() => { setError(""); setCompanyModal(true); }}><Plus size={15} /> New company</button></div>
-              <div className="city-stats"><Stat icon={Layers3} label="companies" value={projects.length} /><Stat icon={FileCode2} label="files mapped" value={formatNumber(allFiles.filter((f) => f.type === "blob").length)} /><Stat icon={GitBranch} label="commits" value={commitCount ? formatNumber(commitCount) : "—"} /><Stat icon={Code2} label="languages" value={allLanguages.length || 1} /></div>
+              <div className="city-stats"><Stat icon={Layers3} label="companies" value={projects.length} /><Stat icon={FileCode2} label="files mapped" value={formatNumber(allFiles.filter((f) => f.type === "blob").length)} /><Stat icon={GitBranch} label="commits" value={commitCount ? formatNumber(commitCount) : "—"} /><Stat icon={Code2} label="languages" value={allLanguages.length || "—"} /></div>
               {tab === "overview" && <>
                 <div className="city-board">
                   <div className="board-top"><div><span className="board-eyebrow"><span className="live-dot" /> CITY VIEW</span><h2>The skyline</h2><p>Each tower is a project. Taller buildings reflect larger codebases.</p></div><div className="board-tools"><span><span className="legend-dot mint-dot" /> Selected company</span><span><span className="legend-dot blue-dot" /> Source file</span><button className="icon-button" onClick={() => setTerminalOpen(true)}><TerminalSquare size={15} /></button></div></div>

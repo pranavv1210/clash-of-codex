@@ -27,6 +27,34 @@ const manifestNames = new Set([
 ]);
 const colors = ["#73F0C2", "#788BFF", "#FFB86B", "#F18EBC", "#8BD3FF", "#B8A1FF"];
 
+const extensionLanguages: Record<string, string> = {
+  ts: "TypeScript", tsx: "TypeScript", mts: "TypeScript", cts: "TypeScript",
+  js: "JavaScript", jsx: "JavaScript", mjs: "JavaScript", cjs: "JavaScript",
+  py: "Python", ipynb: "Python", dart: "Dart", go: "Go", rs: "Rust",
+  java: "Java", kt: "Kotlin", kts: "Kotlin", swift: "Swift", cs: "C#",
+  cpp: "C++", cc: "C++", cxx: "C++", hpp: "C++", c: "C", h: "C",
+  php: "PHP", rb: "Ruby", ex: "Elixir", exs: "Elixir", hs: "Haskell",
+  vue: "Vue", svelte: "Svelte", html: "HTML", css: "CSS", scss: "CSS",
+  less: "CSS", sql: "SQL", sh: "Shell", bash: "Shell", zsh: "Shell",
+  scala: "Scala", r: "R", jl: "Julia", sol: "Solidity", graphql: "GraphQL",
+};
+
+export function getFileLanguage(path: string): string | null {
+  const name = path.split("/").pop() || "";
+  const extension = name.includes(".") ? name.split(".").pop()!.toLowerCase() : "";
+  return extensionLanguages[extension] || null;
+}
+
+function dominantLanguage(files: RepoFile[], fallback: string): string {
+  const counts = new Map<string, number>();
+  for (const file of files) {
+    const language = getFileLanguage(file.path);
+    if (language) counts.set(language, (counts.get(language) || 0) + 1);
+  }
+  return [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || fallback;
+}
+
+
 function rootOf(path: string) {
   const parts = path.split("/");
   return parts.length > 1 ? parts.slice(0, -1).join("/") : "";
@@ -59,7 +87,7 @@ export function organizeProjects(repo: GitHubRepo, entries: RepoFile[], commitCo
       if (!(file.path === root || file.path.startsWith(root + "/"))) return false;
       return !finalRoots.some((child) => child !== root && child.startsWith(root ? root + "/" : "") && file.path.startsWith(child + "/"));
     });
-    const primary = repo.language || "Mixed stack";
+    const primary = dominantLanguage(scoped, repo.language || "Mixed stack");
     return {
       id: `${repo.id}-${index}`,
       name: projectLabel(root, repo.name),
@@ -79,7 +107,7 @@ export function organizeProjects(repo: GitHubRepo, entries: RepoFile[], commitCo
       name: "Shared infrastructure",
       root: "/ (shared & unclassified)",
       files: unassigned,
-      language: repo.language || "Mixed stack",
+      language: dominantLanguage(unassigned, repo.language || "Mixed stack"),
       commits: 0,
       stars: repo.stargazers_count,
       color: colors[projects.length % colors.length],
