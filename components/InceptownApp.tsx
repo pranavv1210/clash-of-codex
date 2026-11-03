@@ -8,7 +8,7 @@ import {
   GitBranch, Github, Globe2, Layers3, LayoutDashboard, LoaderCircle, LockKeyhole,
   MoreHorizontal, Plus, Rocket, Settings2, ShieldCheck, Sparkles, TerminalSquare, X, Zap
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { formatNumber, getRepoSnapshot, getUserRepos } from "@/lib/github";
 import type { GitHubRepo, Mission, Project, RepoFile } from "@/types/inceptown";
@@ -99,6 +99,7 @@ export default function InceptownApp() {
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [view, setView] = useState<"landing" | "repos" | "city">("landing");
   const [busy, setBusy] = useState(false);
+  const [restoring, setRestoring] = useState(true);
   const [error, setError] = useState("");
   const [buildStage, setBuildStage] = useState(0);
   const [commitCount, setCommitCount] = useState(0);
@@ -124,6 +125,75 @@ export default function InceptownApp() {
   const floors = useMemo(() => selectedProject ? getFloors(selectedProject.files) : [], [selectedProject]);
   const allLanguages = useMemo(() => [...new Set(projects.map((project) => project.language).filter(Boolean))], [projects]);
   const stages = ["Surveying the land", "Mapping the streets", "Raising company towers", "Opening the city gates"];
+
+  useEffect(() => {
+    let cancelled = false;
+    async function restoreWorkspace() {
+      try {
+        const raw = window.localStorage.getItem("inceptown:workspace:v1");
+        if (!raw) return;
+        const saved = JSON.parse(raw) as {
+          repo?: GitHubRepo; cityName?: string; missions?: Mission[]; selectedProjectId?: string;
+          provider?: string; model?: string;
+          manualCompanies?: Array<{ id: string; name: string; root: string; color: string }>;
+        };
+        if (!saved.repo?.full_name) return;
+        setSelectedRepo(saved.repo);
+        setRepoOwner(saved.repo.full_name.split("/")[0]);
+        setCityName(saved.cityName || saved.repo.name);
+        setMissions(Array.isArray(saved.missions) ? saved.missions : []);
+        if (saved.provider) setProvider(saved.provider);
+        if (saved.model) setModel(saved.model);
+        setBusy(true);
+        setBuildStage(3);
+        const snapshot = await getRepoSnapshot(saved.repo);
+        if (cancelled) return;
+        const restoredCompanies: Project[] = (saved.manualCompanies || []).map((company) => ({
+          id: company.id,
+          name: company.name,
+          root: company.root,
+          files: company.root && company.root !== "Planned project"
+            ? snapshot.files.filter((file) => file.type === "blob" && (file.path === company.root || file.path.startsWith(company.root + "/")))
+            : [],
+          language: saved.repo?.language || "Mixed stack",
+          commits: 0,
+          stars: 0,
+          color: company.color,
+        }));
+        const restoredProjects = [...snapshot.projects, ...restoredCompanies];
+        setProjects(restoredProjects);
+        setAllFiles(snapshot.files);
+        setCommitCount(snapshot.commits);
+        setTruncated(snapshot.truncated);
+        setSelectedProjectId(restoredProjects.some((project) => project.id === saved.selectedProjectId)
+          ? saved.selectedProjectId || ""
+          : restoredProjects[0]?.id || "");
+        setTab("overview");
+        setView("city");
+      } catch {
+        setError("We couldn't restore the saved city. You can build it again from GitHub.");
+      } finally {
+        if (!cancelled) {
+          setBusy(false);
+          setRestoring(false);
+        }
+      }
+    }
+    restoreWorkspace();
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    if (view !== "city" || !selectedRepo) return;
+    const manualCompanies = projects.filter((project) => project.id.startsWith("manual-")).map(({ id, name, root, color }) => ({ id, name, root, color }));
+    try {
+      window.localStorage.setItem("inceptown:workspace:v1", JSON.stringify({
+        repo: selectedRepo, cityName, missions, selectedProjectId, provider, model, manualCompanies,
+      }));
+    } catch {
+      // Keep the live workspace usable if browser storage is unavailable or full.
+    }
+  }, [view, selectedRepo, cityName, missions, selectedProjectId, provider, model, projects]);
 
   async function discoverRepos(event: FormEvent) {
     event.preventDefault();
@@ -247,9 +317,9 @@ export default function InceptownApp() {
           <motion.div className="build-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <div className="build-modal">
               <div className="build-emblem"><div className="brand-mark large"><span /><span /><span /></div></div>
-              <span className="eyebrow">CITY CONSTRUCTION IN PROGRESS</span>
+              <span className="eyebrow">{restoring ? "RESTORING YOUR CITY" : "CITY CONSTRUCTION IN PROGRESS"}</span>
               <h2>Your world is taking shape.</h2>
-              <p>We&apos;re reading the repository and laying the foundations for your city.</p>
+              <p>{restoring ? "Reconnecting your city and refreshing its repository map." : "We&apos;re reading the repository and laying the foundations for your city."}</p>
               <div className="construction-art"><div className="construction-sun" /><div className="construction-crane"><i /><b /><span /></div><div className="construction-road" /><div className="construction-block block-a" /><div className="construction-block block-b" /><div className="construction-block block-c" /></div>
               <div className="build-progress"><span style={{ width: `${((buildStage + 1) / stages.length) * 100}%` }} /></div>
               <div className="build-stage"><span><LoaderCircle size={14} className="spin" /> {stages[buildStage]}</span><small>{Math.round(((buildStage + 1) / stages.length) * 100)}%</small></div>
