@@ -14,10 +14,12 @@ type Props = {
 };
 
 function Building({ project, index, selected, onSelect }: {
-  project: Project; index: number; selected: boolean; onSelect?: () => void;
+  project: Project; index: number; total: number; selected: boolean; onSelect?: () => void;
 }) {
-  const x = ((index % 3) - 1) * 5.4;
-  const z = (Math.floor(index / 3) - 0.5) * 5.4;
+  const columns = total <= 4 ? 2 : total <= 9 ? 3 : total <= 16 ? 4 : 5;
+  const rows = Math.ceil(total / columns);
+  const x = ((index % columns) - (columns - 1) / 2) * 5.4;
+  const z = (Math.floor(index / columns) - (rows - 1) / 2) * 5.4;
   const floors = Math.max(3, Math.min(12, Math.ceil(Math.log2(project.files.length + project.commits / 12 + 2)) + 2));
   const height = floors * 0.48;
   const color = new THREE.Color(project.color || "#73F0C2");
@@ -139,8 +141,8 @@ function Scene({ projects, selectedProjectId, onSelect }: Props) {
         <meshBasicMaterial color="#263A50" />
       </mesh>
       {trees.map((position, i) => <Tree key={i} position={position} />)}
-      {projects.slice(0, 9).map((project, index) => (
-        <Building key={project.id} project={project} index={index} selected={project.id === selectedProjectId} onSelect={() => onSelect?.(project.id)} />
+      {projects.slice(0, 25).map((project, index) => (
+        <Building key={project.id} project={project} index={index} total={Math.min(projects.length, 25)} selected={project.id === selectedProjectId} onSelect={() => onSelect?.(project.id)} />
       ))}
       <AgentCharacter position={[-7.4, 0.05, 2.8]} color="#73F0C2" />
       <AgentCharacter position={[7.1, 0.05, -4.2]} color="#788BFF" />

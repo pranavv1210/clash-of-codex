@@ -121,7 +121,7 @@ export default function InceptownApp() {
   const [newCompanyPath, setNewCompanyPath] = useState("");
   const [newCompanyPrompt, setNewCompanyPrompt] = useState("");
 
-  const selectedProject = projects.find((project) => project.id === selectedProjectId) || projects[0];
+  const selectedProject = selectedProjectId ? projects.find((project) => project.id === selectedProjectId) : undefined;
   const floors = useMemo(() => selectedProject ? getFloors(selectedProject.files) : [], [selectedProject]);
   const allLanguages = useMemo(() => [...new Set(projects.map((project) => project.language).filter(Boolean))], [projects]);
   const stages = ["Surveying the land", "Mapping the streets", "Raising company towers", "Opening the city gates"];
@@ -416,7 +416,7 @@ export default function InceptownApp() {
               {tab === "overview" && <>
                 <div className="city-board">
                   <div className="board-top"><div><span className="board-eyebrow"><span className="live-dot" /> CITY VIEW</span><h2>The skyline</h2><p>Each tower is a project. Taller buildings reflect larger codebases.</p></div><div className="board-tools"><span><span className="legend-dot mint-dot" /> Active project</span><span><span className="legend-dot blue-dot" /> Project tower</span><button className="icon-button" onClick={() => setTerminalOpen(true)}><TerminalSquare size={15} /></button></div></div>
-                  <CityScene projects={projects} selectedProjectId={selectedProject?.id} onSelect={setSelectedProjectId} />
+                  <CityScene projects={projects} selectedProjectId={selectedProject?.id} onSelect={(id) => { setSelectedProjectId(id); if (window.matchMedia("(max-width: 850px)").matches) setTab("companies"); }} />
                   <div className="board-bottom"><span><Compass size={14} /> Drag to orbit · Scroll to zoom · Select a building to inspect</span><span>{projects.length} DISTRICTS MAPPED</span></div>
                 </div>
                 <div className="overview-lower">
