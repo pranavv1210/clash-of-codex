@@ -1,153 +1,285 @@
 "use client";
 
-import { Canvas } from "@react-three/fiber";
-import { Float, OrbitControls, Stars } from "@react-three/drei";
-import { Suspense, useMemo } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Html, OrbitControls, Stars } from "@react-three/drei";
+import { Suspense, useMemo, useRef } from "react";
 import * as THREE from "three";
-import type { Project } from "@/types/inceptown";
+import type { Group, Mesh } from "three";
+import type { Project, RepoFile } from "@/types/inceptown";
 
 type Props = {
   projects: Project[];
   selectedProjectId?: string;
+  selectedFilePath?: string;
   onSelect?: (id: string) => void;
+  onSelectFile?: (projectId: string, path: string) => void;
   compact?: boolean;
 };
 
-function Building({ project, index, total, selected, onSelect }: {
-  project: Project; index: number; total: number; selected: boolean; onSelect?: () => void;
+const palette: Record<string, string> = {
+  ts: "#65DDB5", tsx: "#65DDB5", js: "#F4C96B", jsx: "#F4C96B",
+  py: "#78A9F8", dart: "#63C7E8", go: "#73D5D0", rs: "#F09A75",
+  java: "#E99A70", kt: "#B69AF5", swift: "#F28F75", css: "#B59AFF",
+  scss: "#E68DBB", html: "#E9A36D", json: "#E6C76F", md: "#B6C5D4",
+  yml: "#9AAEC5", yaml: "#9AAEC5", sql: "#7CB6F5", sh: "#92C78A",
+  svg: "#E6B56C", png: "#A7C98A", lock: "#8494A8", default: "#7D9AAE",
+};
+
+function extensionOf(path: string) {
+  const name = path.split("/").pop() || "";
+  const parts = name.split(".");
+  return parts.length > 1 ? parts.pop()!.toLowerCase() : "default";
+}
+
+function fileColor(file: RepoFile) {
+  return palette[extensionOf(file.path)] || palette.default;
+}
+
+function BuildingWindows({ color, selected }: { color: string; selected: boolean }) {
+  return (
+    <>
+      {[-0.2, 0.2].map((x) => [-0.2, 0.2].map((y) => (
+        <mesh key={x + ":" + y} position={[x, y, 0.371]}>
+          <boxGeometry args={[0.13, 0.13, 0.025]} />
+          <meshBasicMaterial color={selected ? "#F4FFF9" : color} />
+        </mesh>
+      )))}
+      {[-0.2, 0.2].map((x) => [-0.2, 0.2].map((z) => (
+        <mesh key={"side:" + x + ":" + z} position={[0.371, x, z]} rotation={[0, Math.PI / 2, 0]}>
+          <boxGeometry args={[0.13, 0.13, 0.025]} />
+          <meshBasicMaterial color={selected ? "#F4FFF9" : color} />
+        </mesh>
+      )))}
+    </>
+  );
+}
+
+function FileBuilding({ file, position, selected, onClick }: {
+  file: RepoFile; position: [number, number, number]; selected: boolean; onClick?: () => void;
 }) {
-  const columns = total <= 4 ? 2 : total <= 9 ? 3 : total <= 16 ? 4 : 5;
-  const rows = Math.ceil(total / columns);
-  const x = ((index % columns) - (columns - 1) / 2) * 5.4;
-  const z = (Math.floor(index / columns) - (rows - 1) / 2) * 5.4;
-  const floors = Math.max(3, Math.min(12, Math.ceil(Math.log2(project.files.length + project.commits / 12 + 2)) + 2));
-  const height = floors * 0.48;
-  const color = new THREE.Color(project.color || "#73F0C2");
+  const color = fileColor(file);
+  const size = file.size || 1800;
+  const height = Math.max(0.42, Math.min(2.6, 0.38 + Math.log2(size / 350 + 1) * 0.42));
+  const bodyColor = selected ? "#D8FFF0" : "#26394C";
 
   return (
-    <group position={[x, 0, z]}>
-      <mesh position={[0, 0.12, 0]} receiveShadow onClick={(event) => { event.stopPropagation(); onSelect?.(); }}>
-        <boxGeometry args={[2.7, 0.24, 2.7]} />
-        <meshStandardMaterial color={selected ? "#273B4C" : "#1B2A3C"} roughness={0.8} />
+    <group position={position} onClick={(event) => { event.stopPropagation(); onClick?.(); }}>
+      <mesh position={[0, 0.08, 0]} receiveShadow>
+        <boxGeometry args={[0.92, 0.16, 0.92]} />
+        <meshStandardMaterial color={selected ? "#315C59" : "#1C2B3A"} roughness={0.9} />
       </mesh>
-      <mesh position={[0, height / 2 + 0.24, 0]} castShadow receiveShadow onClick={(event) => { event.stopPropagation(); onSelect?.(); }}>
-        <boxGeometry args={[1.65, height, 1.65]} />
-        <meshStandardMaterial color={selected ? color : "#33445A"} emissive={selected ? color : "#101827"} emissiveIntensity={selected ? 0.2 : 0.04} metalness={0.22} roughness={0.45} />
+      <mesh position={[0, height / 2 + 0.16, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.66, height, 0.66]} />
+        <meshStandardMaterial color={bodyColor} emissive={color} emissiveIntensity={selected ? 0.28 : 0.07} roughness={0.62} metalness={0.12} />
       </mesh>
-      {Array.from({ length: floors }, (_, floor) => (
-        <group key={floor} position={[0, 0.48 + floor * 0.48, 0]}>
-          {[-0.47, 0, 0.47].map((offset, i) => (
-            <mesh key={i} position={[offset, 0, 0.84]}>
-              <boxGeometry args={[0.23, 0.19, 0.035]} />
-              <meshBasicMaterial color={selected ? "#B9FFE8" : "#8BA4B7"} />
-            </mesh>
-          ))}
-          {[-0.47, 0, 0.47].map((offset, i) => (
-            <mesh key={i} position={[0.84, 0, offset]} rotation={[0, Math.PI / 2, 0]}>
-              <boxGeometry args={[0.23, 0.19, 0.035]} />
-              <meshBasicMaterial color={selected ? "#B9FFE8" : "#8BA4B7"} />
-            </mesh>
-          ))}
-        </group>
-      ))}
-      <mesh position={[0, height + 0.36, 0]} castShadow>
-        <boxGeometry args={[1.85, 0.12, 1.85]} />
-        <meshStandardMaterial color={selected ? color : "#52677D"} emissive={selected ? color : "#172538"} emissiveIntensity={0.25} />
+      <group position={[0, height / 2 + 0.16, 0]}>
+        <BuildingWindows color={color} selected={selected} />
+      </group>
+      <mesh position={[0, height + 0.22, 0]} castShadow>
+        <boxGeometry args={[0.78, 0.12, 0.78]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={selected ? 0.65 : 0.18} roughness={0.5} />
       </mesh>
-      <mesh position={[0, height + 0.57, 0]}>
-        <cylinderGeometry args={[0.12, 0.12, 0.3, 8]} />
-        <meshStandardMaterial color={selected ? "#73F0C2" : "#788BFF"} emissive={selected ? "#73F0C2" : "#788BFF"} emissiveIntensity={1.5} />
-      </mesh>
-      <mesh position={[0, 0.02, 1.7]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[2.3, 0.36]} />
-        <meshBasicMaterial color={selected ? "#73F0C2" : "#52677D"} transparent opacity={0.9} />
-      </mesh>
+      {selected && <pointLight position={[0, height + 0.7, 0]} color={color} intensity={0.8} distance={3} />}
     </group>
   );
 }
 
-
-function AgentCharacter({ position, color }: { position: [number, number, number]; color: string }) {
+function CompanyTower({ project, center, selected, onClick }: {
+  project: Project; center: [number, number, number]; selected: boolean; onClick?: () => void;
+}) {
+  const floors = Math.max(3, Math.min(10, Math.ceil(Math.log2(project.files.length + 2)) + 1));
+  const height = floors * 0.58;
+  const color = project.color || "#65DDB5";
   return (
-    <Float speed={1.6} rotationIntensity={0.08} floatIntensity={0.16}>
-      <group position={position}>
-        <mesh position={[0, 0.34, 0]} castShadow>
-          <capsuleGeometry args={[0.13, 0.28, 4, 8]} />
-          <meshStandardMaterial color={color} roughness={0.55} />
-        </mesh>
-        <mesh position={[0, 0.62, 0]} castShadow>
-          <sphereGeometry args={[0.13, 16, 16]} />
-          <meshStandardMaterial color="#E8F2F4" roughness={0.35} />
-        </mesh>
-        <mesh position={[0, 0.63, 0.115]}>
-          <boxGeometry args={[0.13, 0.035, 0.025]} />
-          <meshBasicMaterial color="#73F0C2" />
-        </mesh>
-        <mesh position={[-0.19, 0.34, 0]}>
-          <capsuleGeometry args={[0.045, 0.18, 3, 6]} />
-          <meshStandardMaterial color="#D9E6ED" />
-        </mesh>
-        <mesh position={[0.19, 0.34, 0]}>
-          <capsuleGeometry args={[0.045, 0.18, 3, 6]} />
-          <meshStandardMaterial color="#D9E6ED" />
-        </mesh>
-      </group>
-    </Float>
+    <group position={center} onClick={(event) => { event.stopPropagation(); onClick?.(); }}>
+      <mesh position={[0, 0.12, 0]} receiveShadow>
+        <boxGeometry args={[2.65, 0.24, 2.65]} />
+        <meshStandardMaterial color="#26394A" roughness={0.9} />
+      </mesh>
+      <mesh position={[0, height / 2 + 0.24, 0]} castShadow>
+        <boxGeometry args={[1.55, height, 1.55]} />
+        <meshStandardMaterial color="#314B5A" metalness={0.35} roughness={0.38} emissive={color} emissiveIntensity={selected ? 0.2 : 0.07} />
+      </mesh>
+      {Array.from({ length: floors }, (_, floor) => (
+        <group key={floor} position={[0, 0.56 + floor * 0.58, 0]}>
+          {[-0.45, 0, 0.45].map((offset) => (
+            <mesh key={offset} position={[offset, 0, 0.79]}>
+              <boxGeometry args={[0.2, 0.25, 0.03]} />
+              <meshBasicMaterial color={selected ? "#E8FFF6" : color} />
+            </mesh>
+          ))}
+          {[-0.45, 0, 0.45].map((offset) => (
+            <mesh key={"side:" + offset} position={[0.79, 0, offset]} rotation={[0, Math.PI / 2, 0]}>
+              <boxGeometry args={[0.2, 0.25, 0.03]} />
+              <meshBasicMaterial color={selected ? "#E8FFF6" : color} />
+            </mesh>
+          ))}
+        </group>
+      ))}
+      <mesh position={[0, height + 0.38, 0]} castShadow>
+        <boxGeometry args={[1.85, 0.16, 1.85]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.35} />
+      </mesh>
+      <mesh position={[0, height + 0.72, 0]}>
+        <cylinderGeometry args={[0.08, 0.08, 0.55, 8]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.4} />
+      </mesh>
+      <Html position={[0, height + 1.05, 0]} center distanceFactor={15} style={{ pointerEvents: "none" }}>
+        <div className="city-project-label">
+          <strong>{project.name}</strong>
+          <span>{project.files.length} FILES · {project.language}</span>
+        </div>
+      </Html>
+    </group>
+  );
+}
+
+function District({ project, index, columns, selectedProjectId, selectedFilePath, onSelect, onSelectFile }: {
+  project: Project; index: number; columns: number; selectedProjectId?: string; selectedFilePath?: string;
+  onSelect?: (id: string) => void; onSelectFile?: (projectId: string, path: string) => void;
+}) {
+  const row = Math.floor(index / columns);
+  const column = index % columns;
+  const centerX = (column - (columns - 1) / 2) * 18;
+  const rows = Math.ceil(1 / columns);
+  void rows;
+  const centerZ = 0;
+  const selected = project.id === selectedProjectId;
+  const files = project.files.filter((file) => file.type === "blob").slice(0, 42);
+  const fileColumns = 7;
+
+  return (
+    <group position={[centerX, 0, centerZ]}>
+      <mesh position={[0, -0.13, 0]} receiveShadow>
+        <boxGeometry args={[16.4, 0.18, 16.4]} />
+        <meshStandardMaterial color={selected ? "#233E47" : "#1A2B39"} roughness={0.95} />
+      </mesh>
+      <mesh position={[0, -0.025, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[15.9, 15.9]} />
+        <meshBasicMaterial color={project.color || "#65DDB5"} transparent opacity={selected ? 0.08 : 0.035} />
+      </mesh>
+      <mesh position={[0, -0.005, -8.15]}>
+        <boxGeometry args={[16.5, 0.16, 0.18]} />
+        <meshStandardMaterial color={project.color || "#65DDB5"} emissive={project.color || "#65DDB5"} emissiveIntensity={selected ? 0.65 : 0.18} />
+      </mesh>
+      <CompanyTower project={project} center={[0, 0, -5.0]} selected={selected} onClick={() => onSelect?.(project.id)} />
+      {files.map((file, fileIndex) => {
+        const x = ((fileIndex % fileColumns) - (fileColumns - 1) / 2) * 1.35;
+        const z = Math.floor(fileIndex / fileColumns) * 1.35 - 0.35;
+        return (
+          <FileBuilding
+            key={file.path}
+            file={file}
+            position={[x, 0, z]}
+            selected={file.path === selectedFilePath}
+            onClick={() => onSelectFile?.(project.id, file.path)}
+          />
+        );
+      })}
+      {project.files.length > files.length && (
+        <group position={[5.5, 0, 6.5]}>
+          <mesh position={[0, 0.55, 0]}>
+            <boxGeometry args={[0.95, 1.1, 0.95]} />
+            <meshStandardMaterial color="#526A7D" emissive="#788BFF" emissiveIntensity={0.12} />
+          </mesh>
+          <Html position={[0, 1.3, 0]} center distanceFactor={18} style={{ pointerEvents: "none" }}>
+            <div className="city-more-label">+{project.files.length - files.length} MORE</div>
+          </Html>
+        </group>
+      )}
+    </group>
+  );
+}
+
+function Resident({ offset, color }: { offset: number; color: string }) {
+  const group = useRef<Group>(null);
+  const body = useRef<Mesh>(null);
+  useFrame(({ clock }) => {
+    if (!group.current) return;
+    const t = (clock.getElapsedTime() * 0.11 + offset) % 1;
+    const points = [[-7, -9], [7, -9], [7, 9], [-7, 9], [-7, -9]] as const;
+    const scaled = t * 4;
+    const segment = Math.floor(scaled);
+    const blend = scaled - segment;
+    const from = points[segment];
+    const to = points[segment + 1];
+    const x = THREE.MathUtils.lerp(from[0], to[0], blend);
+    const z = THREE.MathUtils.lerp(from[1], to[1], blend);
+    group.current.position.set(x, 0.04 + Math.sin(clock.getElapsedTime() * 7 + offset * 9) * 0.035, z);
+    group.current.rotation.y = Math.atan2(to[0] - from[0], to[1] - from[1]);
+    if (body.current) body.current.rotation.z = Math.sin(clock.getElapsedTime() * 9 + offset) * 0.08;
+  });
+  return (
+    <group ref={group}>
+      <mesh ref={body} position={[0, 0.38, 0]} castShadow>
+        <capsuleGeometry args={[0.13, 0.3, 4, 8]} />
+        <meshStandardMaterial color={color} roughness={0.58} />
+      </mesh>
+      <mesh position={[0, 0.68, 0]} castShadow>
+        <sphereGeometry args={[0.13, 14, 14]} />
+        <meshStandardMaterial color="#E8E6DC" roughness={0.6} />
+      </mesh>
+      <mesh position={[0, 0.69, 0.12]}>
+        <boxGeometry args={[0.12, 0.035, 0.025]} />
+        <meshBasicMaterial color="#172638" />
+      </mesh>
+    </group>
   );
 }
 
 function Tree({ position }: { position: [number, number, number] }) {
   return (
     <group position={position}>
-      <mesh position={[0, 0.32, 0]} castShadow>
-        <cylinderGeometry args={[0.06, 0.08, 0.65, 6]} />
-        <meshStandardMaterial color="#8B705A" />
+      <mesh position={[0, 0.3, 0]} castShadow>
+        <cylinderGeometry args={[0.05, 0.07, 0.6, 6]} />
+        <meshStandardMaterial color="#80664F" />
       </mesh>
-      <mesh position={[0, 0.82, 0]} castShadow>
-        <icosahedronGeometry args={[0.42, 1]} />
-        <meshStandardMaterial color="#367E6A" roughness={0.9} />
+      <mesh position={[0, 0.78, 0]} castShadow>
+        <icosahedronGeometry args={[0.36, 1]} />
+        <meshStandardMaterial color="#397B69" roughness={0.95} />
       </mesh>
     </group>
   );
 }
 
-function Scene({ projects, selectedProjectId, onSelect }: Props) {
-  const trees = useMemo(() => Array.from({ length: 22 }, (_, i) => {
-    const x = ((i * 7) % 19) - 9;
-    const z = ((i * 11) % 17) - 8;
+function Scene({ projects, selectedProjectId, selectedFilePath, onSelect, onSelectFile }: Props) {
+  const columns = Math.max(1, Math.ceil(Math.sqrt(projects.length)));
+  const trees = useMemo(() => Array.from({ length: 30 }, (_, i) => {
+    const x = ((i * 7) % 39) - 19;
+    const z = ((i * 13) % 37) - 18;
     return [x, 0, z] as [number, number, number];
   }), []);
-
   return (
     <>
       <color attach="background" args={["#101827"]} />
-      <fog attach="fog" args={["#101827", 24, 48]} />
-      <ambientLight intensity={1.15} />
-      <directionalLight position={[8, 15, 8]} intensity={2.3} castShadow shadow-mapSize={[1024, 1024]} />
-      <pointLight position={[-8, 7, -8]} intensity={18} color="#788BFF" distance={24} />
-      <pointLight position={[8, 5, 8]} intensity={12} color="#73F0C2" distance={20} />
-      <Stars radius={70} depth={35} count={650} factor={2.1} fade speed={0.35} />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.12, 0]} receiveShadow>
-        <planeGeometry args={[44, 34]} />
-        <meshStandardMaterial color="#172638" roughness={0.96} />
+      <fog attach="fog" args={["#101827", 38, 88]} />
+      <ambientLight intensity={1.25} />
+      <directionalLight position={[14, 22, 12]} intensity={2.1} castShadow shadow-mapSize={[1024, 1024]} />
+      <pointLight position={[-12, 9, -10]} intensity={24} color="#788BFF" distance={42} />
+      <pointLight position={[14, 7, 12]} intensity={18} color="#65DDB5" distance={38} />
+      <Stars radius={95} depth={55} count={850} factor={2.1} fade speed={0.25} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.28, 0]} receiveShadow>
+        <planeGeometry args={[120, 100]} />
+        <meshStandardMaterial color="#111E2B" roughness={0.98} />
       </mesh>
-      <gridHelper args={[40, 32, "#31465A", "#23364A"]} position={[0, 0.005, 0]} />
-      <mesh position={[0, 0.025, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[2.1, 34]} />
-        <meshBasicMaterial color="#263A50" />
-      </mesh>
-      <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, Math.PI / 2]}>
-        <planeGeometry args={[2.1, 42]} />
-        <meshBasicMaterial color="#263A50" />
-      </mesh>
-      {trees.map((position, i) => <Tree key={i} position={position} />)}
-      {projects.slice(0, 25).map((project, index) => (
-        <Building key={project.id} project={project} index={index} total={Math.min(projects.length, 25)} selected={project.id === selectedProjectId} onSelect={() => onSelect?.(project.id)} />
+      <gridHelper args={[100, 60, "#2D4353", "#1B2D3D"]} position={[0, -0.18, 0]} />
+      {Array.from({ length: columns + 1 }, (_, i) => {
+        const x = (i - columns / 2) * 18;
+        return <mesh key={"road-x:" + i} position={[x, -0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[1.15, Math.max(22, Math.ceil(projects.length / columns) * 18)]} /><meshStandardMaterial color="#293A48" roughness={0.92} /></mesh>;
+      })}
+      {Array.from({ length: Math.ceil(projects.length / columns) + 1 }, (_, i) => {
+        const z = (i - Math.ceil(projects.length / columns) / 2) * 18;
+        return <mesh key={"road-z:" + i} position={[0, -0.055, z]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[Math.max(22, columns * 18), 1.15]} /><meshStandardMaterial color="#293A48" roughness={0.92} /></mesh>;
+      })}
+      {projects.slice(0, 12).map((project, index) => (
+        <District key={project.id} project={project} index={index} columns={columns} selectedProjectId={selectedProjectId} selectedFilePath={selectedFilePath} onSelect={onSelect} onSelectFile={onSelectFile} />
       ))}
-      <AgentCharacter position={[-7.4, 0.05, 2.8]} color="#73F0C2" />
-      <AgentCharacter position={[7.1, 0.05, -4.2]} color="#788BFF" />
-      <AgentCharacter position={[2.2, 0.05, 7.2]} color="#FFB86B" />
-      <OrbitControls makeDefault minDistance={9} maxDistance={32} maxPolarAngle={Math.PI / 2.05} minPolarAngle={0.35} enableDamping dampingFactor={0.08} />
+      {trees.map((position, index) => <Tree key={index} position={position} />)}
+      <Resident offset={0} color="#65DDB5" />
+      <Resident offset={0.24} color="#8D9CFF" />
+      <Resident offset={0.51} color="#F0B36D" />
+      <Resident offset={0.76} color="#D98FB6" />
+      <OrbitControls makeDefault target={[0, 0, 0]} minDistance={11} maxDistance={72} maxPolarAngle={Math.PI / 2.08} minPolarAngle={0.34} enableDamping dampingFactor={0.075} />
     </>
   );
 }
@@ -155,12 +287,12 @@ function Scene({ projects, selectedProjectId, onSelect }: Props) {
 export default function CityScene(props: Props) {
   return (
     <div className={`city-canvas ${props.compact ? "city-canvas--compact" : ""}`}>
-      <Canvas shadows dpr={[1, 1.7]} camera={{ position: [17, 17, 20], fov: 38 }} gl={{ antialias: true, alpha: false }}>
+      <Canvas shadows dpr={[1, 1.5]} camera={{ position: [29, 28, 31], fov: 39 }} gl={{ antialias: true, alpha: false }}>
         <Suspense fallback={null}>
           <Scene {...props} />
         </Suspense>
       </Canvas>
-      <div className="city-canvas-hint"><span className="hint-dot" /> DRAG TO EXPLORE <span>·</span> SCROLL TO ZOOM</div>
+      <div className="city-canvas-hint"><span className="hint-dot" /> DRAG TO EXPLORE <span>·</span> SCROLL TO ZOOM <span>·</span> SELECT A BUILDING</div>
     </div>
   );
 }
