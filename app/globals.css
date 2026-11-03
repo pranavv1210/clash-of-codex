@@ -343,7 +343,7 @@ body:has(.workspace) .topbar-right .avatar{background:#679b72;color:#fff}
 .city-company-sign strong,.city-district-sign strong,.city-file-label strong{font-size:10px;font-weight:750;letter-spacing:.1px}
 .city-company-sign span,.city-district-sign span,.city-file-label span{font:7px var(--font-mono);color:#7d917f;letter-spacing:.4px}
 .city-file-label{border-color:#efca78;background:#fff9e8}
-.city-inspector-hud{position:absolute;z-index:27;right:18px;top:132px;width:250px;padding:13px 14px;border:1px solid rgba(255,255,255,.9);border-radius:13px;background:rgba(251,251,244,.94);backdrop-filter:blur(18px);box-shadow:0 12px 32px rgba(62,88,68,.13);pointer-events:auto;color:#385341}
+.city-inspector-hud{position:absolute;z-index:27;right:18px;top:178px;width:250px;padding:13px 14px;border:1px solid rgba(255,255,255,.9);border-radius:13px;background:rgba(251,251,244,.94);backdrop-filter:blur(18px);box-shadow:0 12px 32px rgba(62,88,68,.13);pointer-events:auto;color:#385341}
 .city-inspector-top{display:flex;align-items:center;justify-content:space-between}
 .city-hud-kicker{font:8px var(--font-mono);letter-spacing:1px;color:#829680}
 .city-inspector-top button{display:grid;place-items:center;width:25px;height:25px;border:1px solid #e0e8dc;border-radius:7px;background:#fff;color:#6c806f}
