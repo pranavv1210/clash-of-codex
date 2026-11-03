@@ -218,7 +218,7 @@ function Scene({ projects, selectedProjectId, selectedFilePath, onSelect, onSele
     <RoadNetwork columns={columns} rows={rows} />
     {visible.map((project, index) => <District key={project.id} project={project} index={index} columns={columns} total={visible.length} selectedProjectId={selectedProjectId} selectedFilePath={selectedFilePath} onSelect={onSelect} onSelectFile={onSelectFile} />)}
     {people.map((person, index) => <Person key={index} {...person} />)}
-    <OrbitControls makeDefault target={[0, 0, 0]} minDistance={19} maxDistance={Math.max(90, Math.max(columns, rows) * 48)} minPolarAngle={0.55} maxPolarAngle={1.22} enableDamping dampingFactor={0.08} rotateSpeed={0.55} panSpeed={0.75} zoomSpeed={0.8} />
+    <OrbitControls makeDefault target={[0, 0, 0]} minDistance={19} maxDistance={Math.max(120, Math.max(columns, rows) * 100)} minPolarAngle={0.55} maxPolarAngle={1.22} enableDamping dampingFactor={0.08} rotateSpeed={0.55} panSpeed={0.75} zoomSpeed={0.8} />
   </>;
 }
 
@@ -227,7 +227,7 @@ export default function CityScene(props: Props) {
   const columns = Math.max(1, Math.ceil(Math.sqrt(count)));
   const rows = Math.max(1, Math.ceil(count / columns));
   const scale = Math.max(columns, rows);
-  const position: [number, number, number] = props.compact ? [34, 42, 34] : [Math.max(38, columns * 19), Math.max(48, scale * 22), Math.max(42, rows * 20)];
+  const position: [number, number, number] = props.compact ? [34, 42, 34] : [Math.max(40, columns * 34), Math.max(52, scale * 28), Math.max(44, rows * 34)];
   return <div className={"city-canvas " + (props.compact ? "city-canvas--compact" : "")}>
     <Canvas shadows dpr={[1, 1.4]} camera={{ position, fov: 34, near: 0.1, far: 500 }} gl={{ antialias: true, alpha: false }}>
       <Suspense fallback={null}><Scene {...props} /></Suspense>
