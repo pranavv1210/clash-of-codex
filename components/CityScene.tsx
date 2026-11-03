@@ -87,7 +87,7 @@ function FileBuilding({ file, position, selected, onClick }: {
 function CompanyTower({ project, center, selected, onClick }: {
   project: Project; center: [number, number, number]; selected: boolean; onClick?: () => void;
 }) {
-  const floors = Math.max(3, Math.min(10, Math.ceil(Math.log2(project.files.length + 2)) + 1));
+  const floors = Math.max(3, Math.min(10, Math.ceil(Math.log2(project.files.length + project.commits / 12 + 2)) + 1));
   const height = floors * 0.58;
   const color = project.color || "#65DDB5";
   return (
@@ -134,18 +134,18 @@ function CompanyTower({ project, center, selected, onClick }: {
   );
 }
 
-function District({ project, index, columns, selectedProjectId, selectedFilePath, onSelect, onSelectFile }: {
-  project: Project; index: number; columns: number; selectedProjectId?: string; selectedFilePath?: string;
+function District({ project, index, columns, totalProjects, selectedProjectId, selectedFilePath, onSelect, onSelectFile }: {
+  project: Project; index: number; columns: number; totalProjects: number; selectedProjectId?: string; selectedFilePath?: string;
   onSelect?: (id: string) => void; onSelectFile?: (projectId: string, path: string) => void;
 }) {
   const row = Math.floor(index / columns);
   const column = index % columns;
   const centerX = (column - (columns - 1) / 2) * 18;
-  const rows = Math.ceil(1 / columns);
-  void rows;
-  const centerZ = 0;
+  const rows = Math.ceil(Math.min(12, totalProjects) / columns);
+  const centerZ = (row - (rows - 1) / 2) * 18;
   const selected = project.id === selectedProjectId;
-  const files = project.files.filter((file) => file.type === "blob").slice(0, 42);
+  const fileLimit = Math.min(42, Math.max(12, Math.floor(240 / Math.max(1, totalProjects))));
+  const files = project.files.filter((file) => file.type === "blob").slice(0, fileLimit);
   const fileColumns = 7;
 
   return (
@@ -243,7 +243,7 @@ function Tree({ position }: { position: [number, number, number] }) {
 }
 
 function Scene({ projects, selectedProjectId, selectedFilePath, onSelect, onSelectFile }: Props) {
-  const columns = Math.max(1, Math.ceil(Math.sqrt(projects.length)));
+  const columns = Math.max(1, Math.ceil(Math.sqrt(Math.min(projects.length, 12)));
   const trees = useMemo(() => Array.from({ length: 30 }, (_, i) => {
     const x = ((i * 7) % 39) - 19;
     const z = ((i * 13) % 37) - 18;
@@ -272,7 +272,7 @@ function Scene({ projects, selectedProjectId, selectedFilePath, onSelect, onSele
         return <mesh key={"road-z:" + i} position={[0, -0.055, z]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[Math.max(22, columns * 18), 1.15]} /><meshStandardMaterial color="#293A48" roughness={0.92} /></mesh>;
       })}
       {projects.slice(0, 12).map((project, index) => (
-        <District key={project.id} project={project} index={index} columns={columns} selectedProjectId={selectedProjectId} selectedFilePath={selectedFilePath} onSelect={onSelect} onSelectFile={onSelectFile} />
+        <District key={project.id} project={project} index={index} columns={columns} totalProjects={Math.min(projects.length, 12)} selectedProjectId={selectedProjectId} selectedFilePath={selectedFilePath} onSelect={onSelect} onSelectFile={onSelectFile} />
       ))}
       {trees.map((position, index) => <Tree key={index} position={position} />)}
       <Resident offset={0} color="#65DDB5" />
@@ -285,9 +285,13 @@ function Scene({ projects, selectedProjectId, selectedFilePath, onSelect, onSele
 }
 
 export default function CityScene(props: Props) {
+  const projectCount = Math.min(props.projects.length, 12);
+  const columns = Math.max(1, Math.ceil(Math.sqrt(projectCount)));
+  const rows = Math.ceil(projectCount / columns);
+  const cameraScale = Math.max(columns, rows);
   return (
     <div className={`city-canvas ${props.compact ? "city-canvas--compact" : ""}`}>
-      <Canvas shadows dpr={[1, 1.5]} camera={{ position: [29, 28, 31], fov: 39 }} gl={{ antialias: true, alpha: false }}>
+      <Canvas shadows dpr={[1, 1.5]} camera={{ position: [cameraScale * 10, cameraScale * 9, cameraScale * 11], fov: 39 }} gl={{ antialias: true, alpha: false }}>
         <Suspense fallback={null}>
           <Scene {...props} />
         </Suspense>
