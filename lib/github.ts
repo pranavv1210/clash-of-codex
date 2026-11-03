@@ -93,3 +93,19 @@ export async function getRepoSnapshot(repo: GitHubRepo) {
 export function formatNumber(value: number) {
   return new Intl.NumberFormat("en", { notation: value > 999 ? "compact" : "standard", maximumFractionDigits: 1 }).format(value);
 }
+
+export async function getFileContent(repo: GitHubRepo, path: string): Promise<string> {
+  const cleanPath = path.trim().replace(/^\\/+/, "");
+  if (!cleanPath || cleanPath.split("/").some((part) => part === ".." || part === ".")) {
+    throw new Error("Use a repository-relative file path, such as src/app.tsx.");
+  }
+  const encodedPath = cleanPath.split("/").map(encodeURIComponent).join("/");
+  const file = await github<{ content?: string; encoding?: string; size?: number }>(
+    `${API}/repos/${repo.full_name}/contents/${encodedPath}?ref=${encodeURIComponent(repo.default_branch)}`
+  );
+  if (file.size && file.size > 100_000) throw new Error("That file is too large for the browser inspector. Open it on GitHub instead.");
+  if (!file.content || file.encoding !== "base64") throw new Error("GitHub did not return a text file for that path.");
+  const binary = atob(file.content.replace(/\\s/g, ""));
+  const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}

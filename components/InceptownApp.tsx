@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
-import { formatNumber, getRepoSnapshot, getUserRepos } from "@/lib/github";
+import { formatNumber, getFileContent, getRepoSnapshot, getUserRepos } from "@/lib/github";
 import type { GitHubRepo, Mission, Project, RepoFile } from "@/types/inceptown";
 
 const CityScene = dynamic(() => import("@/components/CityScene"), { ssr: false, loading: () => <div className="scene-loading"><LoaderCircle className="spin" /> Preparing your city…</div> });
@@ -112,6 +112,7 @@ export default function InceptownApp() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [terminalInput, setTerminalInput] = useState("");
+  const [terminalBusy, setTerminalBusy] = useState(false);
   const [terminalLines, setTerminalLines] = useState<string[]>(["INCEPTOWN INSPECTOR v0.1", "Read-only repository console. Type 'help' to see available commands.", ""]);
   const [provider, setProvider] = useState("OpenAI");
   const [model, setModel] = useState("GPT-4.1");
@@ -302,22 +303,84 @@ export default function InceptownApp() {
     setTab(newCompanyPrompt.trim() ? "missions" : "companies");
   }
 
-  function runConsole(event: FormEvent) {
+  async function runConsole(event: FormEvent) {
     event.preventDefault();
     const command = terminalInput.trim();
-    if (!command) return;
-    let output = "";
-    const [verb] = command.split(" ");
-    if (verb === "help") output = "help · status · tree · companies · agents · commits · clear";
-    else if (verb === "status") output = `City: ${cityName}\nRepository: ${selectedRepo?.full_name}\nCompanies: ${projects.length}\nFiles indexed: ${allFiles.length}\nCommits observed: ${commitCount}\nRuntime: inspection-only`;
-    else if (verb === "tree") output = allFiles.slice(0, 35).map((file) => file.path).join("\n") || "No files indexed.";
-    else if (verb === "companies") output = projects.map((project) => `▸ ${project.name}  ${project.root}  (${project.files.length} files)`).join("\n");
-    else if (verb === "agents") output = "Crew templates: Project Manager · Architect · Engineer · QA\nExecution is not connected in this frontend foundation.";
-    else if (verb === "commits") output = `${commitCount ? formatNumber(commitCount) : "Commit count unavailable"} commits observed on the default branch.`;
-    else if (verb === "clear") { setTerminalLines([]); setTerminalInput(""); return; }
-    else output = `Command not found: ${verb}. Type 'help' for available commands.`;
-    setTerminalLines((current) => [...current, `inceptown $ ${command}`, ...output.split("\n"), ""]);
+    if (!command || terminalBusy) return;
+    const [verb, ...rest] = command.split(" ");
+    const argument = rest.join(" ").trim();
     setTerminalInput("");
+    setTerminalBusy(true);
+    setTerminalLines((current) => [...current, `inceptown $ ${command}`]);
+    let output = "";
+    try {
+      if (verb === "help") {
+        output = [
+          "help                 Show available commands",
+          "status               Show the indexed repository snapshot",
+          "ls [folder]          List files and folders",
+          "tree                 Show the repository file tree",
+          "find <name>          Search file paths by name",
+          "cat <path>           Read a text file from the default branch",
+          "head <path>          Preview the first 30 lines of a file",
+          "companies            List project districts",
+          "agents               Show available crew templates",
+          "commits              Show the observed commit count",
+          "clear                Clear this console",
+          "",
+          "This is a read-only GitHub snapshot inspector, not a shell."
+        ].join("\n");
+      } else if (verb === "status") {
+        output = `City: ${cityName}\nRepository: ${selectedRepo?.full_name}\nBranch: ${selectedRepo?.default_branch}\nCompanies: ${projects.length}\nFiles indexed: ${allFiles.filter((file) => file.type === "blob").length}\nCommits observed: ${commitCount}\nSource: public GitHub default-branch snapshot\nShell execution: disabled`;
+      } else if (verb === "tree") {
+        output = allFiles.slice(0, 80).map((file) => `${file.type === "tree" ? "▸" : "·"} ${file.path}`).join("\n") || "No files indexed.";
+        if (allFiles.length > 80) output += `\n… and ${allFiles.length - 80} more entries. Use find <name> to narrow the list.`;
+      } else if (verb === "ls") {
+        const prefix = argument.replace(/^\\/+|\\/+$/g, "");
+        const children = new Map<string, "tree" | "blob">();
+        for (const file of allFiles) {
+          const relative = prefix ? file.path.startsWith(prefix + "/") ? file.path.slice(prefix.length + 1) : "" : file.path;
+          if (!relative) continue;
+          const [first, ...remaining] = relative.split("/");
+          if (!first) continue;
+          children.set(first, remaining.length ? "tree" : file.type);
+        }
+        output = [...children.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([name, type]) => `${type === "tree" ? "▸" : "·"} ${name}`).join("\n") || "No entries found at that path.";
+      } else if (verb === "find") {
+        if (!argument) output = "Usage: find <file or folder name>";
+        else {
+          const matches = allFiles.filter((file) => file.path.toLowerCase().includes(argument.toLowerCase())).slice(0, 60);
+          output = matches.map((file) => file.path).join("\n") || "No matching paths.";
+          if (matches.length === 60) output += "\nShowing the first 60 matches.";
+        }
+      } else if (verb === "cat" || verb === "head") {
+        if (!argument) output = `Usage: ${verb} <repository-relative file path>`;
+        else if (!selectedRepo) output = "Connect a repository first.";
+        else {
+          const content = await getFileContent(selectedRepo, argument);
+          const lines = content.split("\n");
+          const shown = verb === "head" ? lines.slice(0, 30) : lines.slice(0, 90);
+          output = shown.map((line, index) => `${String(index + 1).padStart(3, " ")}  ${line}`).join("\n");
+          if (lines.length > shown.length) output += `\n… ${lines.length - shown.length} more lines. ${verb === "cat" ? "Use head for a shorter preview." : "Open the file on GitHub for the full content."}`;
+        }
+      } else if (verb === "companies") {
+        output = projects.map((project) => `▸ ${project.name}  ${project.root}  (${project.files.length} files)`).join("\n");
+      } else if (verb === "agents") {
+        output = "Available role templates:\nProject Manager · Software Architect · Engineer · QA Specialist\nNo agent sessions are running in this frontend-only deployment.";
+      } else if (verb === "commits") {
+        output = `${commitCount ? formatNumber(commitCount) : "Commit count unavailable"} commits observed on the default branch.`;
+      } else if (verb === "clear") {
+        setTerminalLines([]);
+        return;
+      } else {
+        output = `Command not found: ${verb}. Type 'help' for available commands.`;
+      }
+    } catch (err) {
+      output = err instanceof Error ? err.message : "The repository request failed.";
+    } finally {
+      setTerminalBusy(false);
+    }
+    setTerminalLines((current) => [...current, ...output.split("\n"), ""]);
   }
 
   const demo = view === "landing";
@@ -462,7 +525,7 @@ export default function InceptownApp() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {terminalOpen && <motion.div className="terminal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(e) => { if (e.target === e.currentTarget) setTerminalOpen(false); }}><motion.div className="terminal-window" initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 24, opacity: 0 }}><div className="terminal-titlebar"><div className="terminal-dots"><i /><i /><i /></div><span><TerminalSquare size={14} /> INCEPTOWN INSPECTOR</span><button onClick={() => setTerminalOpen(false)}><X size={16} /></button></div><div className="terminal-meta"><span>READ-ONLY REPOSITORY CONSOLE</span><span>{selectedRepo?.full_name}</span></div><div className="terminal-output">{terminalLines.map((line, i) => <div key={i} className={line.startsWith("inceptown $") ? "terminal-command" : ""}>{line || " "}</div>)}</div><form className="terminal-form" onSubmit={runConsole}><span>inceptown $</span><input value={terminalInput} onChange={(e) => setTerminalInput(e.target.value)} placeholder="Type a command…" autoFocus /><button type="submit"><ArrowUpRight size={16} /></button></form><div className="terminal-foot">Commands inspect the indexed snapshot only. No shell execution or repository writes.</div></motion.div></motion.div>}
+        {terminalOpen && <motion.div className="terminal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(e) => { if (e.target === e.currentTarget) setTerminalOpen(false); }}><motion.div className="terminal-window" initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 24, opacity: 0 }}><div className="terminal-titlebar"><div className="terminal-dots"><i /><i /><i /></div><span><TerminalSquare size={14} /> INCEPTOWN INSPECTOR</span><button onClick={() => setTerminalOpen(false)}><X size={16} /></button></div><div className="terminal-meta"><span>READ-ONLY REPOSITORY CONSOLE</span><span>{selectedRepo?.full_name}</span></div><div className="terminal-output">{terminalLines.map((line, i) => <div key={i} className={line.startsWith("inceptown $") ? "terminal-command" : ""}>{line || " "}</div>)}</div><form className="terminal-form" onSubmit={runConsole}><span>inceptown $</span><input value={terminalInput} onChange={(e) => setTerminalInput(e.target.value)} placeholder={terminalBusy ? "Reading repository…" : "Type a command…"} autoFocus disabled={terminalBusy} /><button type="submit" disabled={terminalBusy}><ArrowUpRight size={16} /></button></form><div className="terminal-foot">Read-only GitHub inspector · try <code>help</code>, <code>ls</code>, <code>find</code>, <code>cat README.md</code> · no shell execution or repository writes.</div></motion.div></motion.div>}
       </AnimatePresence>
 
       <AnimatePresence>
