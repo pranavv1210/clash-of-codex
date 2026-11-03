@@ -520,3 +520,7 @@ body:not(:has(.workspace)) .build-modal>p{color:#7C8D7E}
 body:not(:has(.workspace)) .construction-art{background:linear-gradient(180deg,#D3E9ED,#A9CDA9 72%,#819C78)}
 body:not(:has(.workspace)) .construction-road{background:#C1B9A8;border-color:#E8DDC5}
 body:not(:has(.workspace)) .construction-block{background:#9BBDB0;border-color:rgba(70,115,82,.3)}
+
+.city-agent-tag{display:flex;align-items:center;gap:4px;padding:3px 5px;border:1px solid rgba(255,255,255,.92);border-radius:5px;background:rgba(251,251,244,.94);box-shadow:0 3px 9px rgba(53,80,59,.12);color:#35513e;white-space:nowrap;font-family:Inter,Arial,sans-serif}
+.city-agent-tag strong{font:700 7px var(--font-mono);color:#4e805a}
+.city-agent-tag span{font:6px var(--font-mono);letter-spacing:.25px;color:#829181}
