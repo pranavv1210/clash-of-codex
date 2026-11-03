@@ -118,6 +118,7 @@ export default function InceptownApp() {
   const [companyModal, setCompanyModal] = useState(false);
   const [newCompanyName, setNewCompanyName] = useState("");
   const [newCompanyPath, setNewCompanyPath] = useState("");
+  const [newCompanyPrompt, setNewCompanyPrompt] = useState("");
 
   const selectedProject = projects.find((project) => project.id === selectedProjectId) || projects[0];
   const floors = useMemo(() => selectedProject ? getFloors(selectedProject.files) : [], [selectedProject]);
@@ -188,23 +189,35 @@ export default function InceptownApp() {
 
   function createCompany(event: FormEvent) {
     event.preventDefault();
-    if (!newCompanyName.trim() || !newCompanyPath.trim()) return;
-    const root = newCompanyPath.trim().replace(/^\/+|\/+$/g, "");
-    const scoped = allFiles.filter((file) => file.type === "blob" && (root ? file.path === root || file.path.startsWith(root + "/") : true));
+    if (!newCompanyName.trim()) return;
+    const root = newCompanyPath.trim().replace(/^\\/+|\\/+$/g, "");
+    if (!root && !newCompanyPrompt.trim()) {
+      setError("Add a build brief when creating a company without an existing repository folder.");
+      return;
+    }
+    const scoped = root ? allFiles.filter((file) => file.type === "blob" && (file.path === root || file.path.startsWith(root + "/"))) : [];
     if (root && scoped.length === 0) {
       setError("No files were found at that path. Use a folder path from the repository tree.");
       return;
     }
     const project: Project = {
-      id: `manual-${Date.now()}`, name: newCompanyName.trim(), root: root || "/", files: scoped,
+      id: `manual-${Date.now()}`, name: newCompanyName.trim(), root: root || "Planned project", files: scoped,
       language: selectedRepo?.language || "Mixed stack", commits: 0, stars: 0, color: ["#73F0C2", "#788BFF", "#FFB86B"][projects.length % 3],
     };
     setProjects((current) => [...current, project]);
     setSelectedProjectId(project.id);
+    if (newCompanyPrompt.trim()) {
+      setMissions((current) => [{
+        id: crypto.randomUUID(), prompt: newCompanyPrompt.trim(), projectName: project.name,
+        createdAt: new Date().toISOString(), status: "Draft",
+      }, ...current]);
+    }
     setCompanyModal(false);
     setNewCompanyName("");
     setNewCompanyPath("");
-    setTab("companies");
+    setNewCompanyPrompt("");
+    setError("");
+    setTab(newCompanyPrompt.trim() ? "missions" : "companies");
   }
 
   function runConsole(event: FormEvent) {
@@ -328,7 +341,7 @@ export default function InceptownApp() {
               <button onClick={() => setTerminalOpen(true)}><TerminalSquare size={15} /> Console</button>
             </nav>
             <div className="workspace-scroll">
-              <div className="city-heading"><div><span className="section-kicker">YOUR STARTUP CITY</span>{editingCity ? <form className="rename-form" onSubmit={(e) => { e.preventDefault(); setEditingCity(false); }}><input value={cityName} onChange={(e) => setCityName(e.target.value)} autoFocus /><button className="mini-save"><Check size={14} /></button></form> : <h1>{cityName}</h1>}<p>A living map of <strong>{selectedRepo.full_name}</strong>. Explore a company to see what's inside.</p></div><button className="button button-outline small" onClick={() => setCompanyModal(true)}><Plus size={15} /> New company</button></div>
+              <div className="city-heading"><div><span className="section-kicker">YOUR STARTUP CITY</span>{editingCity ? <form className="rename-form" onSubmit={(e) => { e.preventDefault(); setEditingCity(false); }}><input value={cityName} onChange={(e) => setCityName(e.target.value)} autoFocus /><button className="mini-save"><Check size={14} /></button></form> : <h1>{cityName}</h1>}<p>A living map of <strong>{selectedRepo.full_name}</strong>. Explore a company to see what's inside.</p></div><button className="button button-outline small" onClick={() => { setError(""); setCompanyModal(true); }}><Plus size={15} /> New company</button></div>
               <div className="city-stats"><Stat icon={Layers3} label="companies" value={projects.length} /><Stat icon={FileCode2} label="files mapped" value={formatNumber(allFiles.filter((f) => f.type === "blob").length)} /><Stat icon={GitBranch} label="commits" value={commitCount ? formatNumber(commitCount) : "—"} /><Stat icon={Code2} label="languages" value={allLanguages.length || 1} /></div>
               {tab === "overview" && <>
                 <div className="city-board">
@@ -363,7 +376,7 @@ export default function InceptownApp() {
       )}
 
       <AnimatePresence>
-        {settingsOpen && <motion.div className="modal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(e) => { if (e.target === e.currentTarget) setSettingsOpen(false); }}><motion.div className="settings-modal" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}><div className="modal-header"><div><span className="section-kicker">PREFERENCES & CONNECTIONS</span><h2>City settings</h2></div><button className="icon-button" onClick={() => setSettingsOpen(false)}><X size={17} /></button></div><div className="settings-section"><h3><Cpu size={16} /> AI provider preferences</h3><p>Choose the provider you plan to use with your future Inceptown agent runtime.</p><label className="field-label">PROVIDER</label><select value={provider} onChange={(e) => setProvider(e.target.value)}><option>OpenAI</option><option>Anthropic Claude</option><option>Google Gemini</option><option>OpenRouter</option><option>Custom / compatible API</option></select><label className="field-label">PREFERRED MODEL</label><select value={model} onChange={(e) => setModel(e.target.value)}>{(provider === "OpenAI" ? ["GPT-4.1", "GPT-4.1 mini", "o3", "o4-mini"] : provider === "Anthropic Claude" ? ["Claude Sonnet", "Claude Opus", "Claude Haiku"] : provider === "Google Gemini" ? ["Gemini 2.5 Pro", "Gemini 2.5 Flash"] : ["Provider default", "Custom model"]).map((item) => <option key={item}>{item}</option>)}</select><div className="connection-status"><span className="status-indicator" /><div><strong>Secure connection not configured</strong><small>Provider preference: {provider} · {model}</small></div><span className="quiet-pill">PLANNED</span></div><div className="security-callout"><LockKeyhole size={17} /><p>API keys and subscription sign-in must be handled by a secure server-side connection. This browser-only foundation never asks for or stores your provider secrets. ChatGPT and Claude subscription access is only possible where each provider officially supports it.</p></div></div><div className="settings-section"><h3><Github size={16} /> GitHub connection</h3><div className="connection-status"><span className="status-indicator active" /><div><strong>Public repository access</strong><small>Connected through GitHub's public API</small></div><span className="quiet-pill">ACTIVE</span></div><p className="settings-hint">Private repositories and write access will require a GitHub App installation with granular permissions.</p></div><div className="modal-footer"><span>Settings are session-only in this foundation.</span><button className="button button-primary small" onClick={() => setSettingsOpen(false)}>Done <Check size={14} /></button></div></motion.div></motion.div>}
+        {settingsOpen && <motion.div className="modal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(e) => { if (e.target === e.currentTarget) setSettingsOpen(false); }}><motion.div className="settings-modal" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}><div className="modal-header"><div><span className="section-kicker">PREFERENCES & CONNECTIONS</span><h2>City settings</h2></div><button className="icon-button" onClick={() => setSettingsOpen(false)}><X size={17} /></button></div><div className="settings-section"><h3><Cpu size={16} /> AI provider preferences</h3><p>Choose the provider you plan to use with your future Inceptown agent runtime.</p><label className="field-label">PROVIDER</label><select value={provider} onChange={(e) => { const next = e.target.value; setProvider(next); setModel(next === "OpenAI" ? "GPT-4.1" : next === "Anthropic Claude" ? "Claude Sonnet" : next === "Google Gemini" ? "Gemini 2.5 Pro" : "Provider default"); }}><option>OpenAI</option><option>Anthropic Claude</option><option>Google Gemini</option><option>OpenRouter</option><option>Custom / compatible API</option></select><label className="field-label">PREFERRED MODEL</label><select value={model} onChange={(e) => setModel(e.target.value)}>{(provider === "OpenAI" ? ["GPT-4.1", "GPT-4.1 mini", "o3", "o4-mini"] : provider === "Anthropic Claude" ? ["Claude Sonnet", "Claude Opus", "Claude Haiku"] : provider === "Google Gemini" ? ["Gemini 2.5 Pro", "Gemini 2.5 Flash"] : ["Provider default", "Custom model"]).map((item) => <option key={item}>{item}</option>)}</select><div className="connection-status"><span className="status-indicator" /><div><strong>Secure connection not configured</strong><small>Provider preference: {provider} · {model}</small></div><span className="quiet-pill">PLANNED</span></div><div className="security-callout"><LockKeyhole size={17} /><p>API keys and subscription sign-in must be handled by a secure server-side connection. This browser-only foundation never asks for or stores your provider secrets. ChatGPT and Claude subscription access is only possible where each provider officially supports it.</p></div></div><div className="settings-section"><h3><Github size={16} /> GitHub connection</h3><div className="connection-status"><span className="status-indicator active" /><div><strong>Public repository access</strong><small>Connected through GitHub's public API</small></div><span className="quiet-pill">ACTIVE</span></div><p className="settings-hint">Private repositories and write access will require a GitHub App installation with granular permissions.</p></div><div className="modal-footer"><span>Settings are session-only in this foundation.</span><button className="button button-primary small" onClick={() => setSettingsOpen(false)}>Done <Check size={14} /></button></div></motion.div></motion.div>}
       </AnimatePresence>
 
       <AnimatePresence>
@@ -371,7 +384,7 @@ export default function InceptownApp() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {companyModal && <motion.div className="modal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(e) => { if (e.target === e.currentTarget) setCompanyModal(false); }}><motion.form className="settings-modal company-modal" onSubmit={createCompany} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}><div className="modal-header"><div><span className="section-kicker">EXPAND YOUR CITY</span><h2>Establish a company</h2></div><button type="button" className="icon-button" onClick={() => setCompanyModal(false)}><X size={17} /></button></div><p className="settings-hint">Create a project grouping mapped to an existing folder. This changes the city view only — your repository stays untouched.</p><label className="field-label">COMPANY NAME</label><input className="text-field" required value={newCompanyName} onChange={(e) => setNewCompanyName(e.target.value)} placeholder="e.g. Customer mobile app" /><label className="field-label">REPOSITORY FOLDER PATH</label><input className="text-field" required value={newCompanyPath} onChange={(e) => setNewCompanyPath(e.target.value)} placeholder="e.g. apps/customer" /><div className="modal-footer"><span>Existing paths only are recommended.</span><button className="button button-primary small" type="submit">Create company <ArrowRight size={14} /></button></div></motion.form></motion.div>}
+        {companyModal && <motion.div className="modal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(e) => { if (e.target === e.currentTarget) setCompanyModal(false); }}><motion.form className="settings-modal company-modal" onSubmit={createCompany} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}><div className="modal-header"><div><span className="section-kicker">EXPAND YOUR CITY</span><h2>Establish a company</h2></div><button type="button" className="icon-button" onClick={() => setCompanyModal(false)}><X size={17} /></button></div><p className="settings-hint">Start a new project from an idea, or connect an existing folder. This creates a city organization and mission draft only — it does not write code to GitHub.</p>{error && <p className="inline-error">{error}</p>}<label className="field-label">COMPANY NAME</label><input className="text-field" required value={newCompanyName} onChange={(e) => setNewCompanyName(e.target.value)} placeholder="e.g. Customer mobile app" /><label className="field-label">EXISTING REPOSITORY FOLDER (OPTIONAL)</label><input className="text-field" value={newCompanyPath} onChange={(e) => setNewCompanyPath(e.target.value)} placeholder="e.g. apps/customer" /><label className="field-label">WHAT SHOULD THIS COMPANY BUILD?</label><textarea className="text-field company-brief" value={newCompanyPrompt} onChange={(e) => setNewCompanyPrompt(e.target.value)} placeholder="Describe the product or feature you want this team to create…" rows={4} /><div className="modal-footer"><span>Idea briefs become mission drafts.</span><button className="button button-primary small" type="submit">Create company <ArrowRight size={14} /></button></div></motion.form></motion.div>}
       </AnimatePresence>
     </main>
   );
