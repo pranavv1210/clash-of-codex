@@ -336,7 +336,7 @@ export default function InceptownApp() {
         output = allFiles.slice(0, 80).map((file) => `${file.type === "tree" ? "▸" : "·"} ${file.path}`).join("\n") || "No files indexed.";
         if (allFiles.length > 80) output += `\n… and ${allFiles.length - 80} more entries. Use find <name> to narrow the list.`;
       } else if (verb === "ls") {
-        const prefix = argument.replace(/^\\/+|\\/+$/g, "");
+        const prefix = argument.replace(/^\/+|\/+$/g, "");
         const children = new Map<string, "tree" | "blob">();
         for (const file of allFiles) {
           const relative = prefix ? file.path.startsWith(prefix + "/") ? file.path.slice(prefix.length + 1) : "" : file.path;
