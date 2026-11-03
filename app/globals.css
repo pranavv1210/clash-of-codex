@@ -457,3 +457,7 @@ body:has(.workspace) .topbar-right .avatar{background:#679b72;color:#fff}
   .workspace-scroll:has(.city-board) .city-stats{width:112px}
   .workspace-scroll:has(.city-board) .city-stats .stat{height:29px}
 }
+
+/* The overview has its own in-world inspector and crew HUD; don't stack a second rail over them. */
+.workspace--overview .right-rail{display:none}
+@media(max-width:850px){.workspace--overview .right-rail{display:none}}
