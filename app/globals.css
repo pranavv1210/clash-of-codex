@@ -243,3 +243,38 @@ body{color:#26372F}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* Workspace tab layouts and finishing details */
+@media(min-width:851px){
+  .workspace-scroll:not(:has(.city-board)){overflow:auto;padding:0}
+  .workspace--companies .right-rail,.workspace--missions .right-rail{display:none}
+  .workspace--companies .workspace-scroll,.workspace--missions .workspace-scroll{background:#F4F1E8}
+  .workspace--companies .workspace-top,.workspace--missions .workspace-top{position:fixed}
+}
+.feature-icon.mint{background:#E4F1E6;color:#218A69}
+.feature-icon.violet{background:#ECEAF7;color:#7B72B6}
+.feature-icon.amber{background:#F8EEDC;color:#B97834}
+.feature-foot{color:#718078}
+.chip-icon.mint{background:#E4F1E6;color:#218A69}
+.chip-icon.violet{background:#ECEAF7;color:#7B72B6}
+.feature-card .feature-number{color:#A0AA9E}
+.repo-card-action{border-top-color:#ECEDE4}
+.privacy-note svg{color:#218A69}
+.company-card-building{background:linear-gradient(145deg,#E6F0E4,#D7E7D7);border:1px solid #D7E4D6}
+.company-card-building .tower-windows{background:repeating-linear-gradient(90deg,transparent 0 7px,rgba(255,255,255,.68) 7px 10px),repeating-linear-gradient(0deg,transparent 0 9px,rgba(255,255,255,.72) 9px 12px)}
+.rail-tower{background:linear-gradient(145deg,#E6EBDD,#B9D1C1);box-shadow:0 12px 25px rgba(52,87,58,.13)}
+.rail-tower span{background:rgba(255,255,255,.72)}
+.rail-ground{background:#D4E3D1}
+.city-avatar{background:#E7F2E8;color:#218A69}
+.crew-1{background:#ECEAF7;color:#756CB0}
+.crew-2{background:#F8EEDC;color:#B97834}
+.crew-3{background:#F6E7EA;color:#B66B84}
+.crew-0{background:#E4F1E6;color:#218A69}
+.empty-icon{background:#E8F2E8;color:#218A69}
+.mission-icon{background:#E8F2E8;color:#218A69}
+.status-indicator{background:#C5B58E}
+.status-indicator.active{background:#218A69}
+@media(max-width:850px){
+  .workspace--companies .right-rail,.workspace--missions .right-rail{display:none}
+  .workspace-scroll:not(:has(.city-board)){overflow:auto}
+}

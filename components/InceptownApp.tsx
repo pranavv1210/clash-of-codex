@@ -495,7 +495,7 @@ export default function InceptownApp() {
       )}
 
       {view === "city" && selectedRepo && (
-        <div className="workspace">
+        <div className={`workspace workspace--${tab}`}>
           <aside className="sidebar">
             <Brand onClick={() => setView("repos")} />
             <div className="sidebar-city"><span className="city-avatar"><Globe2 size={17} /></span><span><strong>{cityName || selectedRepo.name}</strong><small>{selectedRepo.full_name}</small></span><button onClick={() => setEditingCity(true)}><MoreHorizontal size={17} /></button></div>

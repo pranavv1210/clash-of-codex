@@ -312,8 +312,8 @@ function Car({ position, color, direction = 0 }: { position: [number, number, nu
         <meshStandardMaterial color="#B6D4D2" roughness={0.25} metalness={0.18} />
       </mesh>
       {[-0.28, 0.28].map((x) => [-0.36, 0.38].map((z) => (
-        <mesh key={x + ":" + z} position={[x, 0.11, z]}>
-          <cylinderGeometry args={[0.11, 0.11, 0.09, 10]} rotation={[0, 0, Math.PI / 2]} />
+        <mesh key={x + ":" + z} position={[x, 0.11, z]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.11, 0.11, 0.09, 10]} />
           <meshStandardMaterial color="#53616A" />
         </mesh>
       )))}
