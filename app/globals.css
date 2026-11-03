@@ -461,3 +461,62 @@ body:has(.workspace) .topbar-right .avatar{background:#679b72;color:#fff}
 /* The overview has its own in-world inspector and crew HUD; don't stack a second rail over them. */
 .workspace--overview .right-rail{display:none}
 @media(max-width:850px){.workspace--overview .right-rail{display:none}}
+
+
+/* The public landing and repository picker use the same daylight palette as the city. */
+body:not(:has(.workspace)){background:#F4F6EE;color:#2C4435}
+body:not(:has(.workspace)) .topbar{background:rgba(251,251,244,.94);border-color:#E0E8DA;box-shadow:0 7px 24px rgba(62,88,68,.09)}
+body:not(:has(.workspace)) .topbar .brand{color:#2D4A39}
+body:not(:has(.workspace)) .topnav a,body:not(:has(.workspace)) .text-link{color:#69806C}
+body:not(:has(.workspace)) .hero{background:#F4F6EE;color:#294334}
+body:not(:has(.workspace)) .hero h1{color:#263F31}
+body:not(:has(.workspace)) .hero h1 em{color:#60956B}
+body:not(:has(.workspace)) .hero-subtitle{color:#718477}
+body:not(:has(.workspace)) .announcement{background:#E8F1E4;border-color:#D7E5D2;color:#64866A}
+body:not(:has(.workspace)) .github-input{background:#FFFEFA;border-color:#DCE6D8;color:#58745E}
+body:not(:has(.workspace)) .github-input span{color:#8C9B8D}
+body:not(:has(.workspace)) .github-input input{color:#2D493A}
+body:not(:has(.workspace)) .github-input input::placeholder{color:#A0ADA0}
+body:not(:has(.workspace)) .button-primary{background:#5E946D;color:#fff;box-shadow:0 5px 14px rgba(82,137,95,.17)}
+body:not(:has(.workspace)) .hero-proof{color:#849486}
+body:not(:has(.workspace)) .hero-visual{background:linear-gradient(145deg,#D9EBE8 0%,#C7E0D0 48%,#AFCFAD 100%);border-color:#D9E6D9;box-shadow:0 18px 55px rgba(72,107,78,.12)}
+body:not(:has(.workspace)) .visual-glow{background:radial-gradient(circle,rgba(255,255,255,.72),transparent 68%)}
+body:not(:has(.workspace)) .visual-label{color:#53745A}
+body:not(:has(.workspace)) .visual-label small{color:#819683}
+body:not(:has(.workspace)) .floating-chip{background:rgba(255,255,249,.94);border-color:#E0E8DA;color:#35513D;box-shadow:0 9px 26px rgba(61,91,67,.13)}
+body:not(:has(.workspace)) .floating-chip small{color:#839384}
+body:not(:has(.workspace)) .trust-strip{background:#E9F0E4;border-color:#DDE7D8;color:#78907B}
+body:not(:has(.workspace)) .trust-strip>div span{color:#5F7A63}
+body:not(:has(.workspace)) .intro-section{background:#FAFAF4;color:#2C4435}
+body:not(:has(.workspace)) .intro-section h2{color:#2C4435}
+body:not(:has(.workspace)) .intro-section h2 span{color:#60956B}
+body:not(:has(.workspace)) .section-lede{color:#78897A}
+body:not(:has(.workspace)) .section-kicker{color:#829681}
+body:not(:has(.workspace)) .feature-card{background:#FFFefa;border-color:#E2E9DE;box-shadow:0 8px 24px rgba(65,91,69,.06)}
+body:not(:has(.workspace)) .feature-card h3{color:#304B38}
+body:not(:has(.workspace)) .feature-card p{color:#7D8D7E}
+body:not(:has(.workspace)) .feature-number{color:#A5B4A2}
+body:not(:has(.workspace)) .feature-foot{color:#829681}
+body:not(:has(.workspace)) .closing-cta{background:#E8F0E3;border-color:#D9E6D5;color:#2C4435;box-shadow:0 12px 35px rgba(66,96,70,.08)}
+body:not(:has(.workspace)) .closing-cta h2{color:#2D4939}
+body:not(:has(.workspace)) .closing-cta h2 em{color:#5E946D}
+body:not(:has(.workspace)) .footer{background:#F4F6EE;border-color:#E0E8DA;color:#6E836F}
+body:not(:has(.workspace)) .footer .brand{color:#2D4A39}
+body:not(:has(.workspace)) .repo-discovery{background:#F4F6EE;color:#2D4939}
+body:not(:has(.workspace)) .repo-discovery h1{color:#2D4939}
+body:not(:has(.workspace)) .repo-discovery h1 em{color:#60956B}
+body:not(:has(.workspace)) .repo-discovery p{color:#778A7A}
+body:not(:has(.workspace)) .repo-card{background:#FFFEFA;border-color:#E0E8DA;box-shadow:0 9px 25px rgba(65,91,69,.06)}
+body:not(:has(.workspace)) .repo-card h3{color:#304B38}
+body:not(:has(.workspace)) .repo-card p{color:#7E8F80}
+body:not(:has(.workspace)) .repo-card .repo-meta{color:#819282}
+body:not(:has(.workspace)) .repo-count{background:#E8F0E3;border-color:#D9E6D5;color:#58765E}
+body:not(:has(.workspace)) .back-link{color:#628169}
+body:not(:has(.workspace)) .privacy-note{background:#EAF2E6;border-color:#D9E7D4;color:#6F866F}
+body:not(:has(.workspace)) .build-overlay{background:rgba(235,243,232,.88)}
+body:not(:has(.workspace)) .build-modal{background:#FBFBF4;border-color:#DCE5D8;color:#385341}
+body:not(:has(.workspace)) .build-modal h2{color:#2E4B3B}
+body:not(:has(.workspace)) .build-modal>p{color:#7C8D7E}
+body:not(:has(.workspace)) .construction-art{background:linear-gradient(180deg,#D3E9ED,#A9CDA9 72%,#819C78)}
+body:not(:has(.workspace)) .construction-road{background:#C1B9A8;border-color:#E8DDC5}
+body:not(:has(.workspace)) .construction-block{background:#9BBDB0;border-color:rgba(70,115,82,.3)}
