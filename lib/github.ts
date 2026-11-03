@@ -95,7 +95,7 @@ export function formatNumber(value: number) {
 }
 
 export async function getFileContent(repo: GitHubRepo, path: string): Promise<string> {
-  const cleanPath = path.trim().replace(/^\\/+/, "");
+  const cleanPath = path.trim().replace(/^\/+/, "");
   if (!cleanPath || cleanPath.split("/").some((part) => part === ".." || part === ".")) {
     throw new Error("Use a repository-relative file path, such as src/app.tsx.");
   }
@@ -105,7 +105,7 @@ export async function getFileContent(repo: GitHubRepo, path: string): Promise<st
   );
   if (file.size && file.size > 100_000) throw new Error("That file is too large for the browser inspector. Open it on GitHub instead.");
   if (!file.content || file.encoding !== "base64") throw new Error("GitHub did not return a text file for that path.");
-  const binary = atob(file.content.replace(/\\s/g, ""));
+  const binary = atob(file.content.replace(/\s/g, ""));
   const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
   return new TextDecoder().decode(bytes);
 }
