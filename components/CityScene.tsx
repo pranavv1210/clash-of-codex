@@ -13,7 +13,7 @@ type Props = {
   compact?: boolean;
 };
 
-function Building({ project, index, selected, onSelect }: {
+function Building({ project, index, total, selected, onSelect }: {
   project: Project; index: number; total: number; selected: boolean; onSelect?: () => void;
 }) {
   const columns = total <= 4 ? 2 : total <= 9 ? 3 : total <= 16 ? 4 : 5;
