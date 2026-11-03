@@ -433,7 +433,7 @@ export default function InceptownApp() {
         )}
       </AnimatePresence>
 
-      <header className={`topbar ${demo ? "topbar--landing" : ""}`}>
+      <header className={`topbar ${demo ? "topbar--landing" : ""} ${view === "city" ? "topbar--workspace" : ""}`}>
         <Brand onClick={() => { setView("landing"); setSelectedRepo(null); }} />
         <nav className="topnav">
           <a href="#how-it-works">How it works</a>
