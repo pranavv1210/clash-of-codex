@@ -155,6 +155,7 @@ export default function InceptownApp() {
 
   const selectedProject = selectedProjectId ? projects.find((project) => project.id === selectedProjectId) : undefined;
   const floors = useMemo(() => selectedProject ? getFloors(selectedProject.files) : [], [selectedProject]);
+  const selectedFile = selectedProject?.files.find((file) => file.path === selectedFilePath);
   const allLanguages = useMemo(() => [...new Set(allFiles.filter((file) => file.type === "blob").map((file) => getFileLanguage(file.path)).filter((language): language is string => Boolean(language)))], [allFiles]);
   const stages = ["Surveying the land", "Mapping the streets", "Raising company towers", "Opening the city gates"];
 
@@ -282,7 +283,7 @@ export default function InceptownApp() {
     setSelectedProjectId(projectId);
     setSelectedFilePath(path);
     setFloorOpen(nextFloor >= 0 ? nextFloor : 0);
-    setTab("companies");
+    setTab("overview");
   }
 
   function createMission(event: FormEvent) {
@@ -297,7 +298,7 @@ export default function InceptownApp() {
     };
     setMissions((current) => [mission, ...current]);
     setPrompt("");
-    setTab("missions");
+    setTab("overview");
   }
 
   function createCompany(event: FormEvent) {
@@ -521,12 +522,25 @@ export default function InceptownApp() {
               {tab === "overview" && <>
                 <div className="city-board">
                   <div className="board-top"><div><span className="board-eyebrow"><span className="live-dot" /> CITY VIEW</span><h2>The skyline</h2><p>Each tower is a project. Taller buildings reflect larger codebases.</p></div><div className="board-tools"><span><span className="legend-dot mint-dot" /> Selected company</span><span><span className="legend-dot blue-dot" /> Source file</span><button className="icon-button" onClick={() => setTerminalOpen(true)}><TerminalSquare size={15} /></button></div></div>
-                  <CityScene projects={projects} selectedProjectId={selectedProject?.id} selectedFilePath={selectedFilePath} onSelect={(id) => { setSelectedProjectId(id); setSelectedFilePath(""); setFloorOpen(0); setTab("companies"); }} onSelectFile={inspectFile} />
+                  <CityScene projects={projects} selectedProjectId={selectedProject?.id} selectedFilePath={selectedFilePath} onSelect={(id) => { setSelectedProjectId(id); setSelectedFilePath(""); setFloorOpen(0); setTab("overview"); }} onSelectFile={inspectFile} />
                   <div className="board-bottom"><span><Compass size={14} /> Drag to orbit · Scroll to zoom · Select a building to inspect</span><span>{projects.length} DISTRICTS MAPPED</span></div>
+                  {selectedProject && <aside className="city-inspector-hud">
+                    <div className="city-inspector-top"><span className="city-hud-kicker">{selectedFile ? "FILE INSPECTOR" : "COMPANY INSPECTOR"}</span><button type="button" onClick={() => setSelectedFilePath("")} aria-label="Clear selection"><X size={14} /></button></div>
+                    <h3>{selectedFile ? selectedFile.path.split("/").pop() : selectedProject.name}</h3>
+                    <p className="city-inspector-path">{selectedFile?.path || selectedProject.root}</p>
+                    <div className="city-inspector-stats">
+                      <div><strong>{selectedFile ? (selectedFile.size ? formatNumber(selectedFile.size) : "—") : formatNumber(selectedProject.files.length)}</strong><small>{selectedFile ? "BYTES" : "FILES"}</small></div>
+                      <div><strong>{selectedFile ? getFileLanguage(selectedFile.path) || "Source" : selectedProject.language}</strong><small>{selectedFile ? "LANGUAGE" : "PRIMARY STACK"}</small></div>
+                    </div>
+                    <div className="city-inspector-actions">
+                      {selectedFile ? <a href={`https://github.com/${selectedRepo.full_name}/blob/${selectedRepo.default_branch}/${selectedFile.path.split("/").map(encodeURIComponent).join("/")}`} target="_blank" rel="noreferrer">Open file on GitHub <ExternalLink size={12} /></a> : <button type="button" onClick={() => setTab("companies")}>Explore company floors <ArrowUpRight size={12} /></button>}
+                    </div>
+                  </aside>}
+
                 </div>
                 <div className="overview-lower">
                   <section className="panel company-panel"><div className="panel-heading"><div><span className="section-kicker">YOUR COMPANIES</span><h3>Project districts</h3></div><button className="subtle-link" onClick={() => setTab("companies")}>View all <ArrowRight size={14} /></button></div>
-                    {projects.slice(0, 4).map((project) => <button className={`company-row ${project.id === selectedProject?.id ? "selected" : ""}`} key={project.id} onClick={() => { setSelectedProjectId(project.id); setSelectedFilePath(""); setFloorOpen(0); setTab("companies"); }}><span className="company-building" style={{ "--building-color": project.color } as React.CSSProperties}><span /></span><span className="company-info"><strong>{project.name}</strong><small>{project.root} · {project.language}</small></span><span className="company-files">{project.files.length} files</span><ChevronRight size={15} /></button>)}
+                    {projects.slice(0, 4).map((project) => <button className={`company-row ${project.id === selectedProject?.id ? "selected" : ""}`} key={project.id} onClick={() => { setSelectedProjectId(project.id); setSelectedFilePath(""); setFloorOpen(0); setTab("overview"); }}><span className="company-building" style={{ "--building-color": project.color } as React.CSSProperties}><span /></span><span className="company-info"><strong>{project.name}</strong><small>{project.root} · {project.language}</small></span><span className="company-files">{project.files.length} files</span><ChevronRight size={15} /></button>)}
                   </section>
                   <section className="panel activity-panel"><div className="panel-heading"><div><span className="section-kicker">CITY ACTIVITY</span><h3>What&apos;s happening</h3></div><span className="quiet-pill">REPO SNAPSHOT</span></div><div className="activity-item"><span className="activity-icon mint"><Github size={15} /></span><span><strong>Repository connected</strong><small>{selectedRepo.full_name}</small></span><time>SCANNED</time></div><div className="activity-item"><span className="activity-icon violet"><Layers3 size={15} /></span><span><strong>{projects.length} project districts mapped</strong><small>Based on repository manifests</small></span><time>SCANNED</time></div><div className="activity-item"><span className="activity-icon amber"><FileCode2 size={15} /></span><span><strong>{allFiles.length} tree entries indexed</strong><small>{truncated ? "GitHub tree response was truncated" : "Default branch snapshot"}</small></span><time>SCANNED</time></div></section>
                 </div>
