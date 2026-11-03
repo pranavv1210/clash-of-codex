@@ -279,7 +279,7 @@ function Scene({ projects, selectedProjectId, selectedFilePath, onSelect, onSele
       <Resident offset={0.24} color="#8D9CFF" />
       <Resident offset={0.51} color="#F0B36D" />
       <Resident offset={0.76} color="#D98FB6" />
-      <OrbitControls makeDefault target={[0, 0, 0]} minDistance={11} maxDistance={72} maxPolarAngle={Math.PI / 2.08} minPolarAngle={0.34} enableDamping dampingFactor={0.075} />
+      <OrbitControls makeDefault target={[0, 0, 0]} minDistance={11} maxDistance={140} maxPolarAngle={Math.PI / 2.08} minPolarAngle={0.34} enableDamping dampingFactor={0.075} />
     </>
   );
 }
@@ -289,9 +289,12 @@ export default function CityScene(props: Props) {
   const columns = Math.max(1, Math.ceil(Math.sqrt(projectCount)));
   const rows = Math.ceil(projectCount / columns);
   const cameraScale = Math.max(columns, rows);
+  const cameraPosition: [number, number, number] = props.compact
+    ? [23, 20, 25]
+    : [cameraScale * 16, cameraScale * 14, cameraScale * 18];
   return (
     <div className={`city-canvas ${props.compact ? "city-canvas--compact" : ""}`}>
-      <Canvas shadows dpr={[1, 1.5]} camera={{ position: [cameraScale * 10, cameraScale * 9, cameraScale * 11], fov: 39 }} gl={{ antialias: true, alpha: false }}>
+      <Canvas shadows dpr={[1, 1.5]} camera={{ position: cameraPosition, fov: 39 }} gl={{ antialias: true, alpha: false }}>
         <Suspense fallback={null}>
           <Scene {...props} />
         </Suspense>
