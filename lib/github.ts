@@ -47,13 +47,18 @@ export function organizeProjects(repo: GitHubRepo, entries: RepoFile[], commitCo
     if (manifestNames.has(name) || name.endsWith(".sln")) roots.add(rootOf(file.path));
   }
 
-  // A repository without clear package boundaries starts as one company.
-  const selectedRoots = roots.size ? [...roots].sort((a, b) => a.split("/").length - b.split("/").length) : [""];
-  const deduped = selectedRoots.filter((root, index) => !selectedRoots.slice(0, index).some((parent) => parent === "" || root.startsWith(parent + "/")));
-  const finalRoots = deduped.length ? deduped : [""];
+  // Keep the deepest detected project boundary for each file. Root-level manifests
+  // become a "repository core" company when nested projects also exist.
+  const finalRoots = roots.size ? [...roots].sort((a, b) => a.split("/").length - b.split("/").length) : [""];
+  const hasNestedRoots = finalRoots.some((root) => root !== "");
 
   return finalRoots.map((root, index) => {
-    const scoped = files.filter((file) => root ? file.path === root || file.path.startsWith(root + "/") : true);
+    const scoped = files.filter((file) => {
+      if (!root && hasNestedRoots) return !file.path.includes("/");
+      if (!root) return true;
+      if (!(file.path === root || file.path.startsWith(root + "/"))) return false;
+      return !finalRoots.some((child) => child !== root && child.startsWith(root ? root + "/" : "") && file.path.startsWith(child + "/"));
+    });
     const primary = repo.language || "Mixed stack";
     return {
       id: `${repo.id}-${index}`,

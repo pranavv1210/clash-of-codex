@@ -18,7 +18,7 @@ function Building({ project, index, selected, onSelect }: {
 }) {
   const x = ((index % 3) - 1) * 5.4;
   const z = (Math.floor(index / 3) - 0.5) * 5.4;
-  const floors = Math.max(3, Math.min(12, Math.ceil(Math.log2(project.files.length + 2)) + 2));
+  const floors = Math.max(3, Math.min(12, Math.ceil(Math.log2(project.files.length + project.commits / 12 + 2)) + 2));
   const height = floors * 0.48;
   const color = new THREE.Color(project.color || "#73F0C2");
 
@@ -61,6 +61,36 @@ function Building({ project, index, selected, onSelect }: {
         <meshBasicMaterial color={selected ? "#73F0C2" : "#52677D"} transparent opacity={0.9} />
       </mesh>
     </group>
+  );
+}
+
+
+function AgentCharacter({ position, color }: { position: [number, number, number]; color: string }) {
+  return (
+    <Float speed={1.6} rotationIntensity={0.08} floatIntensity={0.16}>
+      <group position={position}>
+        <mesh position={[0, 0.34, 0]} castShadow>
+          <capsuleGeometry args={[0.13, 0.28, 4, 8]} />
+          <meshStandardMaterial color={color} roughness={0.55} />
+        </mesh>
+        <mesh position={[0, 0.62, 0]} castShadow>
+          <sphereGeometry args={[0.13, 16, 16]} />
+          <meshStandardMaterial color="#E8F2F4" roughness={0.35} />
+        </mesh>
+        <mesh position={[0, 0.63, 0.115]}>
+          <boxGeometry args={[0.13, 0.035, 0.025]} />
+          <meshBasicMaterial color="#73F0C2" />
+        </mesh>
+        <mesh position={[-0.19, 0.34, 0]}>
+          <capsuleGeometry args={[0.045, 0.18, 3, 6]} />
+          <meshStandardMaterial color="#D9E6ED" />
+        </mesh>
+        <mesh position={[0.19, 0.34, 0]}>
+          <capsuleGeometry args={[0.045, 0.18, 3, 6]} />
+          <meshStandardMaterial color="#D9E6ED" />
+        </mesh>
+      </group>
+    </Float>
   );
 }
 
@@ -112,18 +142,9 @@ function Scene({ projects, selectedProjectId, onSelect }: Props) {
       {projects.slice(0, 9).map((project, index) => (
         <Building key={project.id} project={project} index={index} selected={project.id === selectedProjectId} onSelect={() => onSelect?.(project.id)} />
       ))}
-      <Float speed={1.4} rotationIntensity={0.12} floatIntensity={0.25}>
-        <group position={[-7.5, 2.4, -4.8]}>
-          <mesh castShadow>
-            <sphereGeometry args={[0.22, 16, 16]} />
-            <meshStandardMaterial color="#73F0C2" emissive="#73F0C2" emissiveIntensity={1.2} />
-          </mesh>
-          <mesh position={[0, -0.38, 0]}>
-            <cylinderGeometry args={[0.07, 0.12, 0.42, 8]} />
-            <meshStandardMaterial color="#DDE9F1" />
-          </mesh>
-        </group>
-      </Float>
+      <AgentCharacter position={[-7.4, 0.05, 2.8]} color="#73F0C2" />
+      <AgentCharacter position={[7.1, 0.05, -4.2]} color="#788BFF" />
+      <AgentCharacter position={[2.2, 0.05, 7.2]} color="#FFB86B" />
       <OrbitControls makeDefault minDistance={9} maxDistance={32} maxPolarAngle={Math.PI / 2.05} minPolarAngle={0.35} enableDamping dampingFactor={0.08} />
     </>
   );

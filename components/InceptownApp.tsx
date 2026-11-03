@@ -3,13 +3,13 @@
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ArrowDownLeft, ArrowLeft, ArrowRight, ArrowUpRight, Bot, Box, Check, ChevronDown, ChevronRight,
+  ArrowLeft, ArrowRight, ArrowUpRight, Bot, Box, Check, ChevronDown, ChevronRight,
   CircleHelp, Clock3, Code2, Command, Compass, Cpu, ExternalLink, FileCode2, FileText, Folder,
-  GitBranch, Github, Globe2, Hammer, Layers3, LayoutDashboard, LoaderCircle, LockKeyhole, Menu,
-  MessageSquareText, MoreHorizontal, Plus, Rocket, Search, Settings2, ShieldCheck, Sparkles,
-  TerminalSquare, Trees, X, Zap
+  GitBranch, Github, Globe2, Layers3, LayoutDashboard, LoaderCircle, LockKeyhole,
+  MoreHorizontal, Plus, Rocket, Settings2, ShieldCheck, Sparkles, TerminalSquare, X, Zap
 } from "lucide-react";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import type { FormEvent } from "react";
 import { formatNumber, getRepoSnapshot, getUserRepos } from "@/lib/github";
 import type { GitHubRepo, Mission, Project, RepoFile } from "@/types/inceptown";
 
@@ -69,7 +69,7 @@ function RepoCard({ repo, onBuild }: { repo: GitHubRepo; onBuild: () => void }) 
   );
 }
 
-function FloorRow({ floor, index, active, onClick }: { floor: Floor; index: number; active: boolean; onClick: () => void }) {
+function FloorRow({ floor, repoFullName, branch, active, onClick }: { floor: Floor; repoFullName: string; branch: string; active: boolean; onClick: () => void }) {
   const Icon = floor.icon;
   return (
     <div className={`floor-card ${active ? "floor-card--active" : ""}`}>
@@ -81,7 +81,7 @@ function FloorRow({ floor, index, active, onClick }: { floor: Floor; index: numb
       </button>
       <AnimatePresence initial={false}>
         {active && <motion.div className="floor-files" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-          {floor.files.slice(0, 40).map((file) => <a key={file.path} href={`https://github.com/${file.path}`} target="_blank" rel="noreferrer" className="file-row"><FileCode2 size={13} /><span>{file.path.split("/").pop()}</span><small>{file.path}</small><ExternalLink size={11} /></a>)}
+          {floor.files.slice(0, 40).map((file) => <a key={file.path} href={`https://github.com/${repoFullName}/blob/${branch}/${file.path.split("/").map(encodeURIComponent).join("/")}`} target="_blank" rel="noreferrer" className="file-row"><FileCode2 size={13} /><span>{file.path.split("/").pop()}</span><small>{file.path}</small><ExternalLink size={11} /></a>)}
           {floor.files.length > 40 && <p className="muted tiny">Showing 40 of {floor.files.length} files in this floor.</p>}
         </motion.div>}
       </AnimatePresence>
@@ -191,6 +191,10 @@ export default function InceptownApp() {
     if (!newCompanyName.trim() || !newCompanyPath.trim()) return;
     const root = newCompanyPath.trim().replace(/^\/+|\/+$/g, "");
     const scoped = allFiles.filter((file) => file.type === "blob" && (root ? file.path === root || file.path.startsWith(root + "/") : true));
+    if (root && scoped.length === 0) {
+      setError("No files were found at that path. Use a folder path from the repository tree.");
+      return;
+    }
     const project: Project = {
       id: `manual-${Date.now()}`, name: newCompanyName.trim(), root: root || "/", files: scoped,
       language: selectedRepo?.language || "Mixed stack", commits: 0, stars: 0, color: ["#73F0C2", "#788BFF", "#FFB86B"][projects.length % 3],
@@ -208,7 +212,7 @@ export default function InceptownApp() {
     const command = terminalInput.trim();
     if (!command) return;
     let output = "";
-    const [verb, ...args] = command.split(" ");
+    const [verb] = command.split(" ");
     if (verb === "help") output = "help · status · tree · companies · agents · commits · clear";
     else if (verb === "status") output = `City: ${cityName}\nRepository: ${selectedRepo?.full_name}\nCompanies: ${projects.length}\nFiles indexed: ${allFiles.length}\nCommits observed: ${commitCount}\nRuntime: inspection-only`;
     else if (verb === "tree") output = allFiles.slice(0, 35).map((file) => file.path).join("\n") || "No files indexed.";
@@ -222,12 +226,11 @@ export default function InceptownApp() {
   }
 
   const demo = view === "landing";
-  const visibleProjects = demo ? demoProjects : projects;
 
   return (
     <main className="app-shell">
       <AnimatePresence>
-        {busy && (view !== "city") && (
+        {busy && selectedRepo && (view !== "city") && (
           <motion.div className="build-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <div className="build-modal">
               <div className="build-emblem"><div className="brand-mark large"><span /><span /><span /></div></div>
@@ -318,6 +321,12 @@ export default function InceptownApp() {
           </aside>
           <section className="main-workspace">
             <div className="workspace-top"><div className="breadcrumb"><span>My cities</span><ChevronRight size={13} /><strong>{cityName}</strong></div><div className="workspace-actions"><span className="read-only-badge"><span /> REPOSITORY LINKED</span><a href={selectedRepo.html_url} target="_blank" rel="noreferrer" className="icon-button" title="Open on GitHub"><ExternalLink size={16} /></a><button className="icon-button" onClick={() => setSettingsOpen(true)}><Settings2 size={16} /></button></div></div>
+            <nav className="mobile-workspace-nav" aria-label="Workspace navigation">
+              <button className={tab === "overview" ? "active" : ""} onClick={() => setTab("overview")}><LayoutDashboard size={15} /> City</button>
+              <button className={tab === "companies" ? "active" : ""} onClick={() => setTab("companies")}><Layers3 size={15} /> Companies</button>
+              <button className={tab === "missions" ? "active" : ""} onClick={() => setTab("missions")}><Rocket size={15} /> Missions</button>
+              <button onClick={() => setTerminalOpen(true)}><TerminalSquare size={15} /> Console</button>
+            </nav>
             <div className="workspace-scroll">
               <div className="city-heading"><div><span className="section-kicker">YOUR STARTUP CITY</span>{editingCity ? <form className="rename-form" onSubmit={(e) => { e.preventDefault(); setEditingCity(false); }}><input value={cityName} onChange={(e) => setCityName(e.target.value)} autoFocus /><button className="mini-save"><Check size={14} /></button></form> : <h1>{cityName}</h1>}<p>A living map of <strong>{selectedRepo.full_name}</strong>. Explore a company to see what's inside.</p></div><button className="button button-outline small" onClick={() => setCompanyModal(true)}><Plus size={15} /> New company</button></div>
               <div className="city-stats"><Stat icon={Layers3} label="companies" value={projects.length} /><Stat icon={FileCode2} label="files mapped" value={formatNumber(allFiles.filter((f) => f.type === "blob").length)} /><Stat icon={GitBranch} label="commits" value={commitCount ? formatNumber(commitCount) : "—"} /><Stat icon={Code2} label="languages" value={allLanguages.length || 1} /></div>
@@ -335,7 +344,7 @@ export default function InceptownApp() {
                 </div>
                 <section className="prompt-panel"><div className="prompt-heading"><span className="prompt-spark"><Sparkles size={17} /></span><div><strong>What's the next big idea?</strong><small>Describe a feature, a fix or something entirely new.</small></div><span className="draft-label">MISSION DRAFTS</span></div><form className="mission-form" onSubmit={createMission}><textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder={`Tell your crew what to create in ${selectedProject?.name || "this project"}…`} rows={2} /><div className="mission-form-bottom"><span><Command size={13} /> Captured as a mission draft · no code is changed</span><button className="button button-primary small" type="submit" disabled={!prompt.trim()}><Sparkles size={14} /> Create mission <ArrowRight size={14} /></button></div></form></section>
               </>}
-              {tab === "companies" && <section className="tab-content"><div className="panel-heading"><div><span className="section-kicker">PROJECT ORGANIZATION</span><h2>Your companies</h2><p>These groupings are mapped from repository structure. Nothing has been moved or rewritten.</p></div><button className="button button-primary small" onClick={() => setCompanyModal(true)}><Plus size={15} /> Create company</button></div><div className="company-grid">{projects.map((project) => <button key={project.id} className={`company-card ${project.id === selectedProject?.id ? "selected" : ""}`} onClick={() => setSelectedProjectId(project.id)}><div className="company-card-building" style={{ "--building-color": project.color } as React.CSSProperties}><div className="tower-windows" /></div><span className="company-card-meta"><span>{project.language}</span><span>{project.files.length} files</span></span><h3>{project.name}</h3><p>{project.root}</p><span className="company-card-link">Inspect company <ArrowUpRight size={14} /></span></button>)}</div><section className="panel file-inspector"><div className="panel-heading"><div><span className="section-kicker">COMPANY BLUEPRINT</span><h3>{selectedProject?.name || "Select a company"}</h3><p>{selectedProject?.root}</p></div><span className="quiet-pill">{selectedProject?.files.length || 0} FILES</span></div>{floors.map((floor, index) => <FloorRow key={floor.name} floor={floor} index={index} active={floorOpen === index} onClick={() => setFloorOpen(floorOpen === index ? -1 : index)} />)}</section></section>}
+              {tab === "companies" && <section className="tab-content"><div className="panel-heading"><div><span className="section-kicker">PROJECT ORGANIZATION</span><h2>Your companies</h2><p>These groupings are mapped from repository structure. Nothing has been moved or rewritten.</p></div><button className="button button-primary small" onClick={() => setCompanyModal(true)}><Plus size={15} /> Create company</button></div><div className="company-grid">{projects.map((project) => <button key={project.id} className={`company-card ${project.id === selectedProject?.id ? "selected" : ""}`} onClick={() => setSelectedProjectId(project.id)}><div className="company-card-building" style={{ "--building-color": project.color } as React.CSSProperties}><div className="tower-windows" /></div><span className="company-card-meta"><span>{project.language}</span><span>{project.files.length} files</span></span><h3>{project.name}</h3><p>{project.root}</p><span className="company-card-link">Inspect company <ArrowUpRight size={14} /></span></button>)}</div><section className="panel file-inspector"><div className="panel-heading"><div><span className="section-kicker">COMPANY BLUEPRINT</span><h3>{selectedProject?.name || "Select a company"}</h3><p>{selectedProject?.root}</p></div><span className="quiet-pill">{selectedProject?.files.length || 0} FILES</span></div>{floors.map((floor, index) => <FloorRow key={floor.name} floor={floor} repoFullName={selectedRepo.full_name} branch={selectedRepo.default_branch} active={floorOpen === index} onClick={() => setFloorOpen(floorOpen === index ? -1 : index)} />)}</section></section>}
               {tab === "missions" && <section className="tab-content"><div className="panel-heading"><div><span className="section-kicker">WORK IN MOTION</span><h2>Mission control</h2><p>Capture what you want your future crew to work on.</p></div></div><section className="prompt-panel"><form className="mission-form" onSubmit={createMission}><textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Describe the next feature, improvement or product idea…" rows={3} /><div className="mission-form-bottom"><span>Saved locally as a draft</span><button className="button button-primary small" disabled={!prompt.trim()}><Plus size={14} /> Add mission</button></div></form></section>{missions.length ? <div className="mission-list">{missions.map((mission) => <article className="mission-card" key={mission.id}><span className="mission-icon"><Rocket size={17} /></span><div><span className="quiet-pill">{mission.status}</span><h3>{mission.prompt}</h3><p>{mission.projectName} · {new Date(mission.createdAt).toLocaleString()}</p></div><ArrowUpRight size={16} /></article>)}</div> : <div className="empty-state"><div className="empty-icon"><Rocket size={22} /></div><h3>Your first mission is waiting.</h3><p>Capture an idea above and start shaping what your crew will build.</p></div>}</section>}
               <footer className="workspace-footer"><span>INCEPTOWN EARLY ACCESS · CITY ENGINE 0.1</span><span><ShieldCheck size={13} /> Read-only GitHub connection</span></footer>
             </div>
