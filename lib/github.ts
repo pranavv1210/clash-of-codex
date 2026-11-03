@@ -52,7 +52,7 @@ export function organizeProjects(repo: GitHubRepo, entries: RepoFile[], commitCo
   const finalRoots = roots.size ? [...roots].sort((a, b) => a.split("/").length - b.split("/").length) : [""];
   const hasNestedRoots = finalRoots.some((root) => root !== "");
 
-  return finalRoots.map((root, index) => {
+  const projects = finalRoots.map((root, index) => {
     const scoped = files.filter((file) => {
       if (!root && hasNestedRoots) return !file.path.includes("/");
       if (!root) return true;
@@ -71,6 +71,21 @@ export function organizeProjects(repo: GitHubRepo, entries: RepoFile[], commitCo
       color: colors[index % colors.length],
     };
   });
+  const assignedPaths = new Set(projects.flatMap((project) => project.files.map((file) => file.path)));
+  const unassigned = files.filter((file) => !assignedPaths.has(file.path));
+  if (hasNestedRoots && unassigned.length) {
+    projects.push({
+      id: `${repo.id}-shared`,
+      name: "Shared infrastructure",
+      root: "/ (shared & unclassified)",
+      files: unassigned,
+      language: repo.language || "Mixed stack",
+      commits: 0,
+      stars: repo.stargazers_count,
+      color: colors[projects.length % colors.length],
+    });
+  }
+  return projects;
 }
 
 export async function getRepoSnapshot(repo: GitHubRepo) {

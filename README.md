@@ -7,7 +7,7 @@ Inceptown turns a GitHub repository into an explorable startup city. A repositor
 ## The city
 
 - **Companies are districts.** A company maps to a project root inside the repository.
-- **Files are buildings.** Buildings are colored by file type and scale with the file's size. Company headquarters grow with the project's file and commit footprint.
+- **Files are buildings.** Buildings are colored by file type and scale with the file's size. Company headquarters grow with the project's file footprint.
 - **Floors organize the code.** Select a company to inspect source, tests, configuration, assets and documentation.
 - **The city is navigable.** Orbit, zoom, select a company tower or click a file building to open its company and the matching floor.
 - **The city has ambient life.** Small residents move through the streets; they are visual ambience, not fake agent sessions.

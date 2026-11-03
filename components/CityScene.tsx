@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Html, OrbitControls, Stars } from "@react-three/drei";
+import { Html, Instance, Instances, OrbitControls, Stars } from "@react-three/drei";
 import { Suspense, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { Group, Mesh } from "three";
@@ -35,51 +35,92 @@ function fileColor(file: RepoFile) {
   return palette[extensionOf(file.path)] || palette.default;
 }
 
-function BuildingWindows({ color, selected }: { color: string; selected: boolean }) {
-  return (
-    <>
-      {[-0.2, 0.2].map((x) => [-0.2, 0.2].map((y) => (
-        <mesh key={x + ":" + y} position={[x, y, 0.371]}>
-          <boxGeometry args={[0.13, 0.13, 0.025]} />
-          <meshBasicMaterial color={selected ? "#F4FFF9" : color} />
-        </mesh>
-      )))}
-      {[-0.2, 0.2].map((x) => [-0.2, 0.2].map((z) => (
-        <mesh key={"side:" + x + ":" + z} position={[0.371, x, z]} rotation={[0, Math.PI / 2, 0]}>
-          <boxGeometry args={[0.13, 0.13, 0.025]} />
-          <meshBasicMaterial color={selected ? "#F4FFF9" : color} />
-        </mesh>
-      )))}
-    </>
-  );
-}
-
-function FileBuilding({ file, position, selected, onClick }: {
-  file: RepoFile; position: [number, number, number]; selected: boolean; onClick?: () => void;
+function FileBuildings({ files, projectId, selectedFilePath, onSelectFile }: {
+  files: RepoFile[]; projectId: string; selectedFilePath?: string;
+  onSelectFile?: (projectId: string, path: string) => void;
 }) {
-  const color = fileColor(file);
-  const size = file.size || 1800;
-  const height = Math.max(0.42, Math.min(2.6, 0.38 + Math.log2(size / 350 + 1) * 0.42));
-  const bodyColor = selected ? "#D8FFF0" : "#26394C";
+  const placements = useMemo(() => files.map((file, index) => {
+    const x = ((index % 7) - 3) * 1.35;
+    const z = Math.floor(index / 7) * 1.35 - 0.35;
+    const size = file.size || 1800;
+    const height = Math.max(0.42, Math.min(2.6, 0.38 + Math.log2(size / 350 + 1) * 0.42));
+    return { file, x, z, height, color: fileColor(file) };
+  }), [files]);
+
+  if (!placements.length) return null;
+  const limit = placements.length;
+  const inspect = (file: RepoFile) => (event: { stopPropagation: () => void }) => {
+    event.stopPropagation();
+    onSelectFile?.(projectId, file.path);
+  };
 
   return (
-    <group position={position} onClick={(event) => { event.stopPropagation(); onClick?.(); }}>
-      <mesh position={[0, 0.08, 0]} receiveShadow>
-        <boxGeometry args={[0.92, 0.16, 0.92]} />
-        <meshStandardMaterial color={selected ? "#315C59" : "#1C2B3A"} roughness={0.9} />
-      </mesh>
-      <mesh position={[0, height / 2 + 0.16, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.66, height, 0.66]} />
-        <meshStandardMaterial color={bodyColor} emissive={color} emissiveIntensity={selected ? 0.28 : 0.07} roughness={0.62} metalness={0.12} />
-      </mesh>
-      <group position={[0, height / 2 + 0.16, 0]}>
-        <BuildingWindows color={color} selected={selected} />
-      </group>
-      <mesh position={[0, height + 0.22, 0]} castShadow>
-        <boxGeometry args={[0.78, 0.12, 0.78]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={selected ? 0.65 : 0.18} roughness={0.5} />
-      </mesh>
-      {selected && <pointLight position={[0, height + 0.7, 0]} color={color} intensity={0.8} distance={3} />}
+    <group>
+      <Instances limit={limit}>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial color="#26394C" roughness={0.62} metalness={0.12} />
+        {placements.map((item) => (
+          <Instance
+            key={item.file.path}
+            position={[item.x, item.height / 2 + 0.16, item.z]}
+            scale={[0.66, item.height, 0.66]}
+            color={item.file.path === selectedFilePath ? "#D8FFF0" : "#31485A"}
+            onClick={inspect(item.file)}
+          />
+        ))}
+      </Instances>
+      <Instances limit={limit}>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial roughness={0.5} metalness={0.15} />
+        {placements.map((item) => (
+          <Instance
+            key={item.file.path}
+            position={[item.x, item.height + 0.22, item.z]}
+            scale={[0.78, 0.12, 0.78]}
+            color={item.file.path === selectedFilePath ? "#F4FFF9" : item.color}
+            onClick={inspect(item.file)}
+          />
+        ))}
+      </Instances>
+      <Instances limit={limit}>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshBasicMaterial />
+        {placements.map((item) => (
+          <Instance
+            key={item.file.path}
+            position={[item.x, item.height / 2 + 0.2, item.z + 0.337]}
+            scale={[0.14, 0.16, 0.025]}
+            color={item.file.path === selectedFilePath ? "#FFFFFF" : item.color}
+            onClick={inspect(item.file)}
+          />
+        ))}
+      </Instances>
+      <Instances limit={limit}>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshBasicMaterial />
+        {placements.map((item) => (
+          <Instance
+            key={item.file.path}
+            position={[item.x + 0.337, item.height / 2 + 0.2, item.z]}
+            rotation={[0, Math.PI / 2, 0]}
+            scale={[0.14, 0.16, 0.025]}
+            color={item.file.path === selectedFilePath ? "#FFFFFF" : item.color}
+            onClick={inspect(item.file)}
+          />
+        ))}
+      </Instances>
+      <Instances limit={limit}>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial color="#1C2B3A" roughness={0.9} />
+        {placements.map((item) => (
+          <Instance
+            key={item.file.path}
+            position={[item.x, 0.08, item.z]}
+            scale={[0.92, 0.16, 0.92]}
+            onClick={inspect(item.file)}
+          />
+        ))}
+      </Instances>
     </group>
   );
 }
@@ -87,7 +128,7 @@ function FileBuilding({ file, position, selected, onClick }: {
 function CompanyTower({ project, center, selected, onClick }: {
   project: Project; center: [number, number, number]; selected: boolean; onClick?: () => void;
 }) {
-  const floors = Math.max(3, Math.min(10, Math.ceil(Math.log2(project.files.length + project.commits / 12 + 2)) + 1));
+  const floors = Math.max(3, Math.min(10, Math.ceil(Math.log2(project.files.length + 2)) + 1));
   const height = floors * 0.58;
   const color = project.color || "#65DDB5";
   return (
@@ -146,7 +187,6 @@ function District({ project, index, columns, totalProjects, selectedProjectId, s
   const selected = project.id === selectedProjectId;
   const fileLimit = Math.min(42, Math.max(12, Math.floor(240 / Math.max(1, totalProjects))));
   const files = project.files.filter((file) => file.type === "blob").slice(0, fileLimit);
-  const fileColumns = 7;
 
   return (
     <group position={[centerX, 0, centerZ]}>
@@ -163,19 +203,7 @@ function District({ project, index, columns, totalProjects, selectedProjectId, s
         <meshStandardMaterial color={project.color || "#65DDB5"} emissive={project.color || "#65DDB5"} emissiveIntensity={selected ? 0.65 : 0.18} />
       </mesh>
       <CompanyTower project={project} center={[0, 0, -5.0]} selected={selected} onClick={() => onSelect?.(project.id)} />
-      {files.map((file, fileIndex) => {
-        const x = ((fileIndex % fileColumns) - (fileColumns - 1) / 2) * 1.35;
-        const z = Math.floor(fileIndex / fileColumns) * 1.35 - 0.35;
-        return (
-          <FileBuilding
-            key={file.path}
-            file={file}
-            position={[x, 0, z]}
-            selected={file.path === selectedFilePath}
-            onClick={() => onSelectFile?.(project.id, file.path)}
-          />
-        );
-      })}
+      <FileBuildings files={files} projectId={project.id} selectedFilePath={selectedFilePath} onSelectFile={onSelectFile} />
       {project.files.length > files.length && (
         <group position={[5.5, 0, 6.5]}>
           <mesh position={[0, 0.55, 0]}>
