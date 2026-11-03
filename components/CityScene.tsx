@@ -243,7 +243,7 @@ function Tree({ position }: { position: [number, number, number] }) {
 }
 
 function Scene({ projects, selectedProjectId, selectedFilePath, onSelect, onSelectFile }: Props) {
-  const columns = Math.max(1, Math.ceil(Math.sqrt(Math.min(projects.length, 12)));
+  const columns = Math.max(1, Math.ceil(Math.sqrt(Math.min(projects.length, 12))));
   const trees = useMemo(() => Array.from({ length: 30 }, (_, i) => {
     const x = ((i * 7) % 39) - 19;
     const z = ((i * 13) % 37) - 18;
