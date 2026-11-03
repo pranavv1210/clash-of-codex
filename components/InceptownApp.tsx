@@ -89,6 +89,36 @@ function FloorRow({ floor, repoFullName, branch, active, selectedFilePath, onCli
   );
 }
 
+function CrewBlueprint({ projectName, onConfigure }: { projectName: string; onConfigure: () => void }) {
+  const roles = [
+    { initials: "PM", name: "Project manager", focus: "Plans missions and coordinates delivery", tone: "crew-0" },
+    { initials: "AR", name: "Software architect", focus: "Designs systems and technical direction", tone: "crew-1" },
+    { initials: "DE", name: "Full-stack engineer", focus: "Builds features across the stack", tone: "crew-2" },
+    { initials: "QA", name: "QA engineer", focus: "Tests changes and checks quality", tone: "crew-3" },
+  ];
+  return (
+    <section className="panel crew-blueprint-panel">
+      <div className="panel-heading">
+        <div><span className="section-kicker">COMPANY CREW</span><h3>Specialist role blueprints</h3><p>Scoped to {projectName}.</p></div>
+        <span className="quiet-pill">TEMPLATES</span>
+      </div>
+      <div className="crew-blueprint-grid">
+        {roles.map((role) => (
+          <article className="crew-role-card" key={role.initials}>
+            <span className={`crew-avatar ${role.tone}`}>{role.initials}</span>
+            <div><strong>{role.name}</strong><small>{role.focus}</small></div>
+            <span className="crew-template-status">IDLE</span>
+          </article>
+        ))}
+      </div>
+      <div className="crew-blueprint-footer">
+        <span>Role templates only · no agent sessions are running yet.</span>
+        <button className="subtle-link" onClick={onConfigure}>Configure providers <ArrowUpRight size={13} /></button>
+      </div>
+    </section>
+  );
+}
+
 export default function InceptownApp() {
   const [username, setUsername] = useState("");
   const [repos, setRepos] = useState<GitHubRepo[]>([]);
@@ -502,7 +532,7 @@ export default function InceptownApp() {
                 </div>
                 <section className="prompt-panel"><div className="prompt-heading"><span className="prompt-spark"><Sparkles size={17} /></span><div><strong>What&apos;s the next big idea?</strong><small>Describe a feature, a fix or something entirely new.</small></div><span className="draft-label">MISSION DRAFTS</span></div><form className="mission-form" onSubmit={createMission}><textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder={`Tell your crew what to create in ${selectedProject?.name || "this project"}…`} rows={2} /><div className="mission-form-bottom"><span><Command size={13} /> Captured as a mission draft · no code is changed</span><button className="button button-primary small" type="submit" disabled={!prompt.trim()}><Sparkles size={14} /> Create mission <ArrowRight size={14} /></button></div></form></section>
               </>}
-              {tab === "companies" && <section className="tab-content"><div className="panel-heading"><div><span className="section-kicker">PROJECT ORGANIZATION</span><h2>Your companies</h2><p>These groupings are mapped from repository structure. Nothing has been moved or rewritten.</p></div><button className="button button-primary small" onClick={() => setCompanyModal(true)}><Plus size={15} /> Create company</button></div><div className="company-grid">{projects.map((project) => <button key={project.id} className={`company-card ${project.id === selectedProject?.id ? "selected" : ""}`} onClick={() => setSelectedProjectId(project.id)}><div className="company-card-building" style={{ "--building-color": project.color } as React.CSSProperties}><div className="tower-windows" /></div><span className="company-card-meta"><span>{project.language}</span><span>{project.files.length} files</span></span><h3>{project.name}</h3><p>{project.root}</p><span className="company-card-link">Inspect company <ArrowUpRight size={14} /></span></button>)}</div><section className="panel file-inspector"><div className="panel-heading"><div><span className="section-kicker">COMPANY BLUEPRINT</span><h3>{selectedProject?.name || "Select a company"}</h3><p>{selectedProject?.root}</p></div><span className="quiet-pill">{selectedProject?.files.length || 0} FILES</span></div>{floors.map((floor, index) => <FloorRow key={floor.name} floor={floor} repoFullName={selectedRepo.full_name} branch={selectedRepo.default_branch} active={floorOpen === index} selectedFilePath={selectedFilePath} onClick={() => setFloorOpen(floorOpen === index ? -1 : index)} />)}</section></section>}
+              {tab === "companies" && <section className="tab-content"><div className="panel-heading"><div><span className="section-kicker">PROJECT ORGANIZATION</span><h2>Your companies</h2><p>These groupings are mapped from repository structure. Nothing has been moved or rewritten.</p></div><button className="button button-primary small" onClick={() => setCompanyModal(true)}><Plus size={15} /> Create company</button></div><div className="company-grid">{projects.map((project) => <button key={project.id} className={`company-card ${project.id === selectedProject?.id ? "selected" : ""}`} onClick={() => setSelectedProjectId(project.id)}><div className="company-card-building" style={{ "--building-color": project.color } as React.CSSProperties}><div className="tower-windows" /></div><span className="company-card-meta"><span>{project.language}</span><span>{project.files.length} files</span></span><h3>{project.name}</h3><p>{project.root}</p><span className="company-card-link">Inspect company <ArrowUpRight size={14} /></span></button>)}</div><section className="panel file-inspector"><div className="panel-heading"><div><span className="section-kicker">COMPANY BLUEPRINT</span><h3>{selectedProject?.name || "Select a company"}</h3><p>{selectedProject?.root}</p></div><span className="quiet-pill">{selectedProject?.files.length || 0} FILES</span></div>{floors.map((floor, index) => <FloorRow key={floor.name} floor={floor} repoFullName={selectedRepo.full_name} branch={selectedRepo.default_branch} active={floorOpen === index} selectedFilePath={selectedFilePath} onClick={() => setFloorOpen(floorOpen === index ? -1 : index)} />)}</section><CrewBlueprint projectName={selectedProject?.name || "this company"} onConfigure={() => setSettingsOpen(true)} /></section>}
               {tab === "missions" && <section className="tab-content"><div className="panel-heading"><div><span className="section-kicker">WORK IN MOTION</span><h2>Mission control</h2><p>Capture what you want your future crew to work on.</p></div></div><section className="prompt-panel"><form className="mission-form" onSubmit={createMission}><textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Describe the next feature, improvement or product idea…" rows={3} /><div className="mission-form-bottom"><span>Saved locally as a draft</span><button className="button button-primary small" disabled={!prompt.trim()}><Plus size={14} /> Add mission</button></div></form></section>{missions.length ? <div className="mission-list">{missions.map((mission) => <article className="mission-card" key={mission.id}><span className="mission-icon"><Rocket size={17} /></span><div><span className="quiet-pill">{mission.status}</span><h3>{mission.prompt}</h3><p>{mission.projectName} · {new Date(mission.createdAt).toLocaleString()}</p></div><ArrowUpRight size={16} /></article>)}</div> : <div className="empty-state"><div className="empty-icon"><Rocket size={22} /></div><h3>Your first mission is waiting.</h3><p>Capture an idea above and start shaping what your crew will build.</p></div>}</section>}
               <footer className="workspace-footer"><span>INCEPTOWN EARLY ACCESS · CITY ENGINE 0.1</span><span><ShieldCheck size={13} /> Read-only GitHub connection</span></footer>
             </div>

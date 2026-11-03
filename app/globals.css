@@ -117,3 +117,14 @@
   .workspace .main-workspace:has(.city-board)>.workspace-top{display:none}
   .workspace-scroll:has(.city-board) .overview-lower{bottom:150px}
 }
+
+.crew-blueprint-panel{margin-top:14px}
+.crew-blueprint-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px}
+.crew-role-card{display:flex;align-items:center;gap:10px;min-width:0;padding:11px;border:1px solid rgba(255,255,255,.08);border-radius:9px;background:rgba(255,255,255,.02)}
+.crew-role-card>div{flex:1;min-width:0}
+.crew-role-card strong,.crew-role-card small{display:block}
+.crew-role-card strong{font-size:10px;color:#e8f0f5}
+.crew-role-card small{font-size:8px;line-height:1.5;color:#8193a6;margin-top:4px}
+.crew-template-status{font:8px var(--font-mono);letter-spacing:.6px;color:#8da09f;border:1px solid rgba(115,240,194,.15);padding:4px 6px;border-radius:5px}
+.crew-blueprint-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;color:#74879b;font-size:9px}
+@media(max-width:600px){.crew-blueprint-grid{grid-template-columns:1fr}.crew-blueprint-footer{align-items:flex-start;flex-direction:column}}
