@@ -190,7 +190,7 @@ export default function InceptownApp() {
   function createCompany(event: FormEvent) {
     event.preventDefault();
     if (!newCompanyName.trim()) return;
-    const root = newCompanyPath.trim().replace(/^\\/+|\\/+$/g, "");
+    const root = newCompanyPath.trim().replace(/^\/+|\/+$/g, "");
     if (!root && !newCompanyPrompt.trim()) {
       setError("Add a build brief when creating a company without an existing repository folder.");
       return;
