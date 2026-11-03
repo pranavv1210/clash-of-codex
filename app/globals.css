@@ -36,3 +36,72 @@
 .city-project-label span{font:8px 'DM Mono',monospace;color:#82a79d;letter-spacing:.4px}
 .city-more-label{padding:5px 8px;border-radius:5px;background:rgba(17,30,43,.9);border:1px solid rgba(120,139,255,.35);color:#aebaff;font:8px 'DM Mono',monospace;white-space:nowrap}
 .file-row--selected{background:rgba(101,221,181,.11);color:#8cf0c9}
+
+/* Immersive city mode: the world is the workspace, not a card in a dashboard. */
+@media(min-width:851px){
+  .workspace{height:calc(100vh - 76px);min-height:620px;display:block;position:relative;overflow:hidden;background:#0b1521}
+  .workspace .sidebar,.workspace .right-rail{display:none}
+  .workspace .main-workspace{height:100%;min-height:0;position:relative}
+  .workspace-top{position:absolute;z-index:18;top:14px;left:50%;transform:translateX(-50%);height:42px;width:max-content;max-width:calc(100% - 40px);padding:0 15px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:rgba(10,20,31,.78);backdrop-filter:blur(18px);box-shadow:0 10px 35px rgba(0,0,0,.22)}
+  .workspace-scroll:has(.city-board){height:100%;overflow:hidden;padding:0;position:relative}
+  .workspace-scroll:has(.city-board) .city-heading{position:absolute;z-index:12;top:22px;left:24px;display:block;max-width:380px;padding:12px 15px;border:1px solid rgba(255,255,255,.1);border-radius:11px;background:rgba(10,20,31,.78);backdrop-filter:blur(18px);box-shadow:0 12px 38px rgba(0,0,0,.2)}
+  .workspace-scroll:has(.city-board) .city-heading h1{font-size:24px;margin:5px 0 3px}
+  .workspace-scroll:has(.city-board) .city-heading p{font-size:9px}
+  .workspace-scroll:has(.city-board) .city-heading>div>span{font-size:8px}
+  .workspace-scroll:has(.city-board) .city-heading>.button{position:absolute;right:12px;top:12px}
+  .workspace-scroll:has(.city-board) .city-stats{position:absolute;z-index:12;top:22px;right:22px;width:280px;grid-template-columns:repeat(2,1fr);gap:7px;margin:0}
+  .workspace-scroll:has(.city-board) .city-stats .stat{height:48px;padding:0 10px;background:rgba(10,20,31,.8);backdrop-filter:blur(16px);border-color:rgba(255,255,255,.1)}
+  .workspace-scroll:has(.city-board) .city-stats .stat small{font-size:8px}
+  .workspace-scroll:has(.city-board) .city-board{position:absolute;inset:0;border:0;border-radius:0;background:transparent;overflow:visible}
+  .workspace-scroll:has(.city-board) .board-top{display:none}
+  .workspace-scroll:has(.city-board) .city-board .city-canvas{height:100%;min-height:620px;position:absolute;inset:0}
+  .workspace-scroll:has(.city-board) .board-bottom{position:absolute;z-index:5;bottom:13px;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100% - 40px);padding:8px 12px;border:1px solid rgba(255,255,255,.1);border-radius:20px;background:rgba(10,20,31,.68);backdrop-filter:blur(14px);font-size:8px}
+  .workspace-scroll:has(.city-board) .overview-lower{position:absolute;z-index:13;left:22px;bottom:22px;width:300px;display:block;margin:0}
+  .workspace-scroll:has(.city-board) .overview-lower .activity-panel{display:none}
+  .workspace-scroll:has(.city-board) .overview-lower .company-panel{max-height:260px;overflow:auto;background:rgba(10,20,31,.84);backdrop-filter:blur(18px);box-shadow:0 18px 48px rgba(0,0,0,.24)}
+  .workspace-scroll:has(.city-board) .prompt-panel{position:absolute;z-index:14;right:22px;bottom:22px;width:min(610px,calc(100% - 355px));margin:0;background:rgba(12,24,35,.9);backdrop-filter:blur(20px);box-shadow:0 18px 55px rgba(0,0,0,.28)}
+  .workspace-scroll:has(.city-board) .workspace-footer{display:none}
+  .workspace-scroll:has(.city-board) .mobile-workspace-nav{display:none}
+}
+@media(max-width:850px){
+  .workspace{height:calc(100vh - 66px);min-height:650px;display:block;position:relative;overflow:hidden;background:#0b1521}
+  .workspace .sidebar,.workspace .right-rail{display:none}
+  .workspace .main-workspace{height:100%;min-height:0;position:relative}
+  .workspace-top{position:absolute;z-index:18;top:8px;left:50%;transform:translateX(-50%);height:38px;width:max-content;max-width:calc(100% - 24px);padding:0 10px;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:rgba(10,20,31,.82);backdrop-filter:blur(16px)}
+  .workspace-top .breadcrumb span{display:none}
+  .workspace-scroll:has(.city-board){height:100%;overflow:hidden;padding:0;position:relative}
+  .workspace-scroll:has(.city-board) .city-heading{position:absolute;z-index:12;top:9px;left:10px;max-width:calc(100% - 20px);padding:9px 11px;border:1px solid rgba(255,255,255,.1);border-radius:9px;background:rgba(10,20,31,.82);backdrop-filter:blur(16px)}
+  .workspace-scroll:has(.city-board) .city-heading h1{font-size:17px;letter-spacing:-.5px;margin:3px 0}
+  .workspace-scroll:has(.city-board) .city-heading p{display:none}
+  .workspace-scroll:has(.city-board) .city-heading>div>span{font-size:7px}
+  .workspace-scroll:has(.city-board) .city-heading>.button{position:absolute;right:7px;top:7px;min-height:29px;font-size:9px}
+  .workspace-scroll:has(.city-board) .city-stats{position:absolute;z-index:12;top:66px;left:10px;right:10px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin:0}
+  .workspace-scroll:has(.city-board) .city-stats .stat{height:39px;justify-content:center;gap:4px;padding:0 4px;background:rgba(10,20,31,.8);backdrop-filter:blur(12px);border-color:rgba(255,255,255,.1)}
+  .workspace-scroll:has(.city-board) .city-stats .stat span{font-size:12px}
+  .workspace-scroll:has(.city-board) .city-stats .stat small{display:none}
+  .workspace-scroll:has(.city-board) .city-board{position:absolute;inset:0;border:0;border-radius:0;background:transparent;overflow:visible}
+  .workspace-scroll:has(.city-board) .board-top{display:none}
+  .workspace-scroll:has(.city-board) .city-board .city-canvas{height:100%;min-height:650px;position:absolute;inset:0}
+  .workspace-scroll:has(.city-board) .board-bottom{display:none}
+  .workspace-scroll:has(.city-board) .overview-lower{position:absolute;z-index:13;left:10px;right:10px;bottom:104px;display:block;margin:0}
+  .workspace-scroll:has(.city-board) .overview-lower .activity-panel{display:none}
+  .workspace-scroll:has(.city-board) .overview-lower .company-panel{max-height:94px;overflow:auto;padding:9px;background:rgba(10,20,31,.86);backdrop-filter:blur(16px)}
+  .workspace-scroll:has(.city-board) .overview-lower .panel-heading{margin-bottom:4px}
+  .workspace-scroll:has(.city-board) .overview-lower .panel-heading h3{font-size:11px;margin:2px 0}
+  .workspace-scroll:has(.city-board) .overview-lower .panel-heading .section-kicker{font-size:7px}
+  .workspace-scroll:has(.city-board) .company-row{display:inline-flex;width:auto;max-width:230px;padding:5px}
+  .workspace-scroll:has(.city-board) .company-row .company-info{max-width:125px}
+  .workspace-scroll:has(.city-board) .company-row .company-info small{max-width:125px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .workspace-scroll:has(.city-board) .prompt-panel{position:absolute;z-index:14;left:10px;right:10px;bottom:10px;width:auto;margin:0;padding:9px;background:rgba(12,24,35,.92);backdrop-filter:blur(18px)}
+  .workspace-scroll:has(.city-board) .prompt-heading{margin-bottom:6px}
+  .workspace-scroll:has(.city-board) .prompt-heading strong{font-size:10px}
+  .workspace-scroll:has(.city-board) .prompt-heading small{font-size:8px}
+  .workspace-scroll:has(.city-board) .mission-form textarea{min-height:43px;padding:8px;font-size:10px}
+  .workspace-scroll:has(.city-board) .mission-form-bottom{margin-top:5px}
+  .workspace-scroll:has(.city-board) .mission-form-bottom>span{font-size:7px}
+  .workspace-scroll:has(.city-board) .mission-form-bottom .button{min-height:28px}
+  .workspace-scroll:has(.city-board) .workspace-footer{display:none}
+  .workspace-scroll:has(.city-board) .mobile-workspace-nav{position:absolute;z-index:17;display:flex;top:8px;right:9px;width:max-content;padding:3px;gap:2px;border:1px solid rgba(255,255,255,.1);border-radius:9px;background:rgba(10,20,31,.82);backdrop-filter:blur(16px)}
+  .workspace-scroll:has(.city-board) .mobile-workspace-nav button{flex:none;min-width:0;padding:7px 8px;font-size:8px}
+  .workspace-scroll:has(.city-board) .mobile-workspace-nav button svg{width:12px;height:12px}
+}
