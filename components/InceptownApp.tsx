@@ -536,6 +536,7 @@ export default function InceptownApp() {
                       {selectedFile ? <a href={`https://github.com/${selectedRepo.full_name}/blob/${selectedRepo.default_branch}/${selectedFile.path.split("/").map(encodeURIComponent).join("/")}`} target="_blank" rel="noreferrer">Open file on GitHub <ExternalLink size={12} /></a> : <button type="button" onClick={() => setTab("companies")}>Explore company floors <ArrowUpRight size={12} /></button>}
                     </div>
                   </aside>}
+                  {selectedProject && <div className="city-crew-hud"><CrewBlueprint projectName={selectedProject.name} onConfigure={() => setSettingsOpen(true)} /></div>}
 
                 </div>
                 <div className="overview-lower">
