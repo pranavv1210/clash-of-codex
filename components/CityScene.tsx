@@ -152,6 +152,34 @@ function Person({ start, end, color, delay }: { start: [number, number, number];
   </group>;
 }
 
+
+function AgentCharacter({ position, initials, color, role }: { position: [number, number, number]; initials: string; color: string; role: string }) {
+  return <group position={position}>
+    <mesh position={[0, 0.34, 0]} castShadow><capsuleGeometry args={[0.13, 0.24, 4, 8]} /><meshStandardMaterial color={color} roughness={0.78} /></mesh>
+    <mesh position={[0, 0.64, 0]} castShadow><sphereGeometry args={[0.13, 12, 12]} /><meshStandardMaterial color="#F1D6B5" roughness={0.9} /></mesh>
+    <mesh position={[0, 0.76, 0]}><sphereGeometry args={[0.14, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2]} /><meshStandardMaterial color="#6B5746" roughness={0.9} /></mesh>
+    <mesh position={[0.16, 0.34, -0.02]}><boxGeometry args={[0.12, 0.2, 0.16]} /><meshStandardMaterial color="#D8C49D" roughness={0.9} /></mesh>
+    <Html position={[0, 0.98, 0]} center distanceFactor={20} style={{ pointerEvents: "none" }}>
+      <div className="city-agent-tag"><strong>{initials}</strong><span>{role} · IDLE</span></div>
+    </Html>
+  </group>;
+}
+
+function TrafficCar({ lane, color, delay = 0, reverse = false }: { lane: number; color: string; delay?: number; reverse?: boolean }) {
+  const ref = useRef<Group>(null);
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const t = (clock.getElapsedTime() * 0.032 + delay) % 1;
+    ref.current.position.set((t - 0.5) * 62 * (reverse ? -1 : 1), 0.06, lane);
+    ref.current.rotation.y = reverse ? Math.PI / 2 : -Math.PI / 2;
+  });
+  return <group ref={ref}>
+    <mesh position={[0, 0.25, 0]} castShadow><boxGeometry args={[1.25, 0.4, 0.64]} /><meshStandardMaterial color={color} roughness={0.65} /></mesh>
+    <mesh position={[-0.06, 0.5, 0]} castShadow><boxGeometry args={[0.66, 0.28, 0.54]} /><meshStandardMaterial color="#DCEBE5" roughness={0.3} /></mesh>
+    {[-0.38, 0.38].map((x) => [-0.3, 0.3].map((z) => <mesh key={x + ":" + z} position={[x, 0.13, z]}><cylinderGeometry args={[0.13, 0.13, 0.08, 12]} /><meshStandardMaterial color="#50564E" /></mesh>))}
+  </group>;
+}
+
 function District({ project, index, columns, total, selectedProjectId, selectedFilePath, onSelect, onSelectFile }: {
   project: Project; index: number; columns: number; total: number; selectedProjectId?: string; selectedFilePath?: string;
   onSelect?: (id: string) => void; onSelectFile?: (projectId: string, path: string) => void;
@@ -166,6 +194,11 @@ function District({ project, index, columns, total, selectedProjectId, selectedF
     <mesh position={[0, -0.28, 0]} receiveShadow><boxGeometry args={[24, 0.52, 24]} /><meshStandardMaterial color={selected ? "#82B98A" : "#91BE94"} roughness={1} /></mesh>
     <mesh position={[0, -0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[23.6, 23.6]} /><meshStandardMaterial color={selected ? "#A4CE9D" : "#AED0A4"} roughness={1} /></mesh>
     <CompanyHQ project={project} selected={selected} onSelect={() => onSelect?.(project.id)} />
+    <AgentCharacter position={[-2.5, 0.02, -3.9]} initials="PM" color="#D58A57" role="PM" />
+    <AgentCharacter position={[-0.85, 0.02, -3.9]} initials="AR" color="#7896B4" role="ARCH" />
+    <AgentCharacter position={[0.85, 0.02, -3.9]} initials="DEV" color="#6E9D77" role="DEV" />
+    <AgentCharacter position={[2.5, 0.02, -3.9]} initials="QA" color="#A181B3" role="QA" />
+
     {files.map((file, fileIndex) => <FileBuilding key={file.path} file={file} projectId={project.id} index={fileIndex} selected={file.path === selectedFilePath} onSelect={onSelectFile} />)}
     {trees.map((position, i) => <Tree key={i} position={position} scale={0.7 + (i % 3) * 0.1} />)}
     {selected && <mesh position={[0, 0.035, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[11.3, 11.55, 64]} /><meshBasicMaterial color="#EAB85C" /></mesh>}
@@ -218,6 +251,8 @@ function Scene({ projects, selectedProjectId, selectedFilePath, onSelect, onSele
     <RoadNetwork columns={columns} rows={rows} />
     {visible.map((project, index) => <District key={project.id} project={project} index={index} columns={columns} total={visible.length} selectedProjectId={selectedProjectId} selectedFilePath={selectedFilePath} onSelect={onSelect} onSelectFile={onSelectFile} />)}
     {people.map((person, index) => <Person key={index} {...person} />)}
+    <TrafficCar lane={-1.0} color="#E1A45E" delay={0.06} />
+    <TrafficCar lane={1.0} color="#7798B4" delay={0.52} reverse />
     <OrbitControls makeDefault target={[0, 0, 0]} minDistance={19} maxDistance={Math.max(120, Math.max(columns, rows) * 100)} minPolarAngle={0.55} maxPolarAngle={1.22} enableDamping dampingFactor={0.08} rotateSpeed={0.55} panSpeed={0.75} zoomSpeed={0.8} />
   </>;
 }
