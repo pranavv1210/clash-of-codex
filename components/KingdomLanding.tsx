@@ -1,106 +1,51 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { motion } from "framer-motion";
-import {
-  ArrowRight, Bot, CheckCircle2, ChevronRight, Code2, Coins, Github,
-  Hammer, Layers3, Settings, Sparkles, Swords, Target, Users, Zap
-} from "lucide-react";
-import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
+import { Activity, Code2, Command, FileCode2, Github, LoaderCircle, Map as MapIcon, Radio, Search, ShieldAlert, TerminalSquare, X } from "lucide-react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import { formatNumber, getFileLanguage, getRepoSnapshot, getUserRepos } from "@/lib/github";
+import type { GitHubRepo, Project, RepoFile } from "@/types/inceptown";
 import styles from "./KingdomLanding.module.css";
 
-const KingdomScene = dynamic(() => import("@/components/KingdomScene"), {
-  ssr: false,
-  loading: () => <div className={styles.sceneLoading}>Raising the kingdom…</div>,
-});
-
-const builders = [
-  { initials: "AR", name: "Architect", task: "Role template", color: "purple" },
-  { initials: "CD", name: "Codex Dev", task: "Not connected", color: "green" },
-  { initials: "QA", name: "QA Scout", task: "Not connected", color: "blue" },
-];
+const CityScene = dynamic(() => import("@/components/CityScene"), { ssr: false, loading: () => <div className={styles.loading}><LoaderCircle /> Mapping city structures…</div> });
+type Transmission = { id: string; label: string; detail: string; time: string };
+const clock = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
 export default function KingdomLanding() {
-  return (
-    <main className={styles.kingdom}>
-      <header className={styles.topbar}>
-        <Link href="/" className={styles.brand} aria-label="Clash of Codex home">
-          <span className={styles.crest}><Swords size={23} /></span>
-          <span><strong>CLASH OF CODEX</strong><small>YOUR ENGINEERING KINGDOM</small></span>
-        </Link>
-        <div className={styles.resources}>
-          <div className={styles.resource}><span className={styles.gold}><Coins size={18} /></span><span><b>BUILD XP</b><strong>—</strong></span></div>
-          <div className={styles.resource}><span className={styles.elixir}><Zap size={18} /></span><span><b>AI ENERGY</b><strong>SETUP</strong></span></div>
-          <div className={styles.resource}><span className={styles.builder}><Hammer size={18} /></span><span><b>BUILDERS</b><strong>0/0</strong></span></div>
-        </div>
-        <div className={styles.actions}>
-          <Link href="/workspace" className={styles.githubButton}><Github size={17} /> CONNECT GITHUB</Link>
-          <Link href="/workspace" className={styles.settings} aria-label="Settings"><Settings size={19} /></Link>
-          <Link href="/workspace" className={styles.profile} aria-label="Open workspace">P</Link>
-        </div>
-      </header>
+  const [username, setUsername] = useState(""); const [repos, setRepos] = useState<GitHubRepo[]>([]); const [repo, setRepo] = useState<GitHubRepo | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]); const [files, setFiles] = useState<RepoFile[]>([]); const [commits, setCommits] = useState(0);
+  const [selectedProjectId, setSelectedProjectId] = useState(""); const [selectedFilePath, setSelectedFilePath] = useState("");
+  const [busy, setBusy] = useState(false); const [error, setError] = useState(""); const [searchOpen, setSearchOpen] = useState(false); const [query, setQuery] = useState("");
+  const [permissionMode, setPermissionMode] = useState<"ask" | "safe">("ask"); const [order, setOrder] = useState(""); const [transmissions, setTransmissions] = useState<Transmission[]>([]);
+  const selectedProject = projects.find((project) => project.id === selectedProjectId); const selectedFile = selectedProject?.files.find((file) => file.path === selectedFilePath);
+  const sourceFiles = useMemo(() => files.filter((file) => file.type === "blob"), [files]);
+  const directories = useMemo(() => new Set(sourceFiles.flatMap((file) => file.path.split("/").slice(0, -1).map((_, i, parts) => parts.slice(0, i + 1).join("/")))).size, [sourceFiles]);
+  const languages = useMemo(() => { const counts = new globalThis.Map<string, number>(); sourceFiles.forEach((file) => { const language = getFileLanguage(file.path) || "Other"; counts.set(language, (counts.get(language) || 0) + 1); }); return [...counts.entries()].sort((a, b) => b[1] - a[1]); }, [sourceFiles]);
+  const results = useMemo(() => query ? sourceFiles.filter((file) => file.path.toLowerCase().includes(query.toLowerCase())).slice(0, 30) : [], [query, sourceFiles]);
 
-      <section className={styles.world}>
-        <div className={styles.skyGlow} />
-        <div className={styles.scene}>
-          <KingdomScene />
-        </div>
-        <div className={styles.worldVignette} />
+  useEffect(() => { const saved = localStorage.getItem("codex-city:repo:v1"); if (saved) try { const restored = JSON.parse(saved) as GitHubRepo; if (restored.full_name) void openCity(restored, true); } catch { /* ignore invalid local state */ } }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  function transmit(label: string, detail: string) { setTransmissions((items) => [{ id: crypto.randomUUID(), label, detail, time: clock() }, ...items].slice(0, 8)); }
+  async function discover(event: FormEvent) { event.preventDefault(); setBusy(true); setError(""); try { setRepos(await getUserRepos(username)); } catch (cause) { setError(cause instanceof Error ? cause.message : "GitHub discovery failed."); } finally { setBusy(false); } }
+  async function openCity(next: GitHubRepo, restoring = false) { setBusy(true); setError(""); setRepo(next); try { const snapshot = await getRepoSnapshot(next); setFiles(snapshot.files); setProjects(snapshot.projects); setCommits(snapshot.commits); setSelectedProjectId(snapshot.projects[0]?.id || ""); localStorage.setItem("codex-city:repo:v1", JSON.stringify(next)); transmit(restoring ? "CITY RESTORED" : "REPOSITORY SCANNED", `${snapshot.files.length} structures mapped from ${next.default_branch}`); } catch (cause) { setRepo(null); setError(cause instanceof Error ? cause.message : "Repository scan failed."); } finally { setBusy(false); } }
+  function inspectFile(projectId: string, path: string) { setSelectedProjectId(projectId); setSelectedFilePath(path); transmit("FILE INSPECTED", path); }
+  function chooseFile(file: RepoFile) { const project = projects.find((item) => item.files.some((candidate) => candidate.path === file.path)); if (project) inspectFile(project.id, file.path); setSearchOpen(false); setQuery(""); }
 
-        <motion.aside className={styles.leftStack} initial={{ x: -24, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: .55 }}>
-          <section className={styles.panel}>
-            <div className={styles.panelTitle}><span className={styles.crown}>♛</span><h2>KINGDOM OVERVIEW</h2></div>
-            <div className={styles.repoLine}><Github size={16} /><span>Connect a repository to begin</span></div>
-            <div className={styles.statGrid}>
-              <div><Code2 size={19} /><strong>—</strong><small>PROJECTS</small></div>
-              <div><Bot size={19} /><strong>4</strong><small>AGENTS</small></div>
-              <div><Target size={19} /><strong>—</strong><small>MISSIONS</small></div>
-            </div>
-            <div className={styles.ready}><CheckCircle2 size={15} /> YOUR KINGDOM AWAITS</div>
-          </section>
+  return <main className={styles.cityShell}>
+    <div className={styles.cityStage}><CityScene projects={projects} selectedProjectId={selectedProjectId} selectedFilePath={selectedFilePath} onSelect={(id) => { setSelectedProjectId(id); setSelectedFilePath(""); }} onSelectFile={inspectFile} />{!repo && <div className={styles.disconnected}><MapIcon /><strong>NO CITY CONNECTED</strong><small>Connect a public GitHub repository to generate a real city.</small></div>}</div>
+    <header className={styles.cityBrand}><span><Code2 /></span><div><strong>CODEX CITY</strong><small>SOFTWARE OPERATIONS MAP</small></div><button onClick={() => setSearchOpen(true)} disabled={!repo}><Search /> SEARCH</button></header>
 
-          <section className={styles.panel}>
-            <div className={styles.panelTitle}><span className={styles.questIcon}><Target size={17} /></span><h2>FIRST QUEST</h2></div>
-            <h3>Connect your GitHub realm</h3>
-            <p>Choose a repository and watch your codebase become a living kingdom.</p>
-            <Link href="/workspace" className={styles.questButton}>START QUEST <ChevronRight size={16} /></Link>
-          </section>
-        </motion.aside>
+    <aside className={`${styles.panel} ${styles.scan}`}><Title icon={<Radio />} label="CITY SCAN" state={repo ? "SYNCED" : "OFFLINE"} good={!!repo} /><strong className={styles.big}>{repo ? formatNumber(files.length) : "—"}</strong><small>STRUCTURES MAPPED</small><div className={styles.metrics}><Metric value={directories || "—"} label="DIRECTORIES" /><Metric value={sourceFiles.length || "—"} label="FILES" /><Metric value={languages.length || "—"} label="LANGUAGES" /></div><div className={styles.langs}>{languages.slice(0, 5).map(([language, count]) => <span key={language}>{language.slice(0, 3).toUpperCase()} <b>{count}</b></span>)}</div><div className={styles.changes}><span>ADDED <b>—</b></span><span>MODIFIED <b>—</b></span><span>DELETED <b>—</b></span></div>{!repo && <form className={styles.connect} onSubmit={discover}><label>PUBLIC GITHUB USER</label><div><Github /><input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="username" /><button disabled={busy || !username.trim()}>{busy ? <LoaderCircle /> : "SCAN"}</button></div></form>}{error && <p className={styles.error}>{error}</p>}{!repo && repos.length > 0 && <div className={styles.repos}>{repos.slice(0, 8).map((item) => <button key={item.id} onClick={() => void openCity(item)}><span><strong>{item.name}</strong><small>{item.language || "Mixed"} · {item.default_branch}</small></span><b>OPEN</b></button>)}</div>}</aside>
 
-        <motion.aside className={styles.rightStack} initial={{ x: 24, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: .55, delay: .08 }}>
-          <section className={styles.panel}>
-            <div className={styles.panelTitle}><Users size={18} /><h2>BUILDER ROLES</h2><span className={styles.count}>PREVIEW</span></div>
-            {builders.map((builder) => (
-              <div className={styles.builderRow} key={builder.initials}>
-                <span className={`${styles.builderAvatar} ${styles[builder.color]}`}>{builder.initials}</span>
-                <span className={styles.builderInfo}><strong>{builder.name}</strong><small>{builder.task}</small></span>
-                <span className={styles.online} />
-              </div>
-            ))}
-            <Link href="/workspace" className={styles.panelLink}>CONFIGURE BUILDERS <ArrowRight size={13} /></Link>
-          </section>
+    <aside className={`${styles.panel} ${styles.mayor}`}><Title label="CODEX · MAYOR CONSOLE" state="RUNTIME OFFLINE" /><div className={styles.repo}><Github /><span><strong>{repo?.full_name || "No repository connected"}</strong><small>{repo ? `${repo.default_branch} · ${formatNumber(commits)} commits observed` : "Connect GitHub to initialize the city"}</small></span></div><div className={styles.agent}><span>CX</span><div><strong>Codex crew</strong><small>No execution adapter configured</small></div><i /></div><section className={styles.permit}><ShieldAlert /><span><strong>NO PENDING PERMITS</strong><small>Requests appear only from a connected execution backend.</small></span></section><h3><Activity /> TRANSMISSIONS <span>REAL EVENTS ONLY</span></h3><div className={styles.feed}>{transmissions.length ? transmissions.map((item) => <div key={item.id}><time>{item.time}</time><span><strong>{item.label}</strong><small>{item.detail}</small></span></div>) : <p>No repository events received in this session.</p>}</div></aside>
 
-          <section className={styles.panel}>
-            <div className={styles.panelTitle}><Sparkles size={17} /><h2>KINGDOM ACTIVITY</h2></div>
-            <div className={styles.activity}><span className={styles.activityDot} /><span><strong>Kingdom preview loaded</strong><small>Connect GitHub to create your world</small></span></div>
-            <div className={styles.activity}><span className={styles.activityDotMuted} /><span><strong>Agent roles available</strong><small>No agent sessions running</small></span></div>
-          </section>
-        </motion.aside>
+    <aside className={`${styles.panel} ${styles.order}`}><Title icon={<Command />} label="MAYOR'S ORDER" state="CREW SETUP" /><div className={styles.orderMeta}><Metric value="Codex worker" label="CREW" /><Metric value="Unavailable" label="EFFORT" /></div><div className={styles.policy}><button className={permissionMode === "ask" ? styles.active : ""} onClick={() => setPermissionMode("ask")}>ASK MAYOR</button><button className={permissionMode === "safe" ? styles.active : ""} onClick={() => setPermissionMode("safe")}>AUTO-SAFE</button></div><p>{permissionMode === "ask" ? "Sensitive operations pause for explicit mayor approval." : "Only safe and reversible operations may run automatically."}</p><textarea value={order} onChange={(e) => setOrder(e.target.value)} placeholder={selectedFile ? `Order for ${selectedFile.path}` : "What should the crew build?"} /><button className={styles.dispatch} disabled><TerminalSquare /> DISPATCH UNAVAILABLE</button></aside>
 
-        <div className={styles.cityCaption}><span className={styles.live} /> YOUR KINGDOM · VISUAL PREVIEW</div>
-        <div className={styles.sceneHint}>DRAG TO ORBIT <i /> SCROLL TO ZOOM <i /> SELECT A BUILDING</div>
-      </section>
-
-      <footer className={styles.commandDock}>
-        <div className={styles.level}><span className={styles.star}>★</span><span><small>KINGDOM</small><strong>LEVEL 01</strong></span></div>
-        <div className={styles.commandBox}>
-          <Sparkles size={18} />
-          <span>What shall your builders create today?</span>
-          <Link href="/workspace" className={styles.createButton}>CONNECT REPOSITORY <ArrowRight size={16} /></Link>
-        </div>
-        <Link href="/workspace" className={styles.viewButton}><Layers3 size={16} /> ENTER KINGDOM</Link>
-      </footer>
-      <div className={styles.mobileNote}>Connect GitHub to generate your own engineering kingdom.</div>
-    </main>
-  );
+    {selectedFile && <aside className={`${styles.panel} ${styles.inspector}`}><Title icon={<FileCode2 />} label="FILE INSPECTOR" action={() => setSelectedFilePath("")} /><h2>{selectedFile.path.split("/").pop()}</h2><code>{selectedFile.path}</code><dl><Metric label="LANGUAGE" value={getFileLanguage(selectedFile.path) || "Unknown"} /><Metric label="SIZE" value={selectedFile.size ? `${formatNumber(selectedFile.size)} B` : "Unavailable"} /><Metric label="DISTRICT" value={selectedProject?.name || "—"} /><Metric label="GIT STATE" value="Snapshot" /></dl><a href={`https://github.com/${repo?.full_name}/blob/${repo?.default_branch}/${selectedFile.path.split("/").map(encodeURIComponent).join("/")}`} target="_blank" rel="noreferrer">OPEN ON GITHUB</a></aside>}
+    <div className={styles.hint}>DRAG TO ORBIT · SCROLL TO ZOOM · SELECT A STRUCTURE</div>
+    <AnimatePresence>{searchOpen && <motion.div className={styles.backdrop} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(e) => { if (e.target === e.currentTarget) setSearchOpen(false); }}><motion.section className={styles.searchModal} initial={{ y: -20 }} animate={{ y: 0 }} exit={{ y: -20 }}><div><Search /><input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search mapped files…" /><button onClick={() => setSearchOpen(false)}><X /></button></div>{results.map((file) => <button key={file.path} onClick={() => chooseFile(file)}><FileCode2 /><span><strong>{file.path.split("/").pop()}</strong><small>{file.path}</small></span><b>{getFileLanguage(file.path) || "FILE"}</b></button>)}{query && !results.length && <p>No mapped file matches that search.</p>}</motion.section></motion.div>}</AnimatePresence>
+  </main>;
 }
+
+function Title({ icon, label, state, good, action }: { icon?: React.ReactNode; label: string; state?: string; good?: boolean; action?: () => void }) { return <div className={styles.title}><span>{icon}{label}</span>{action ? <button onClick={action}><X /></button> : state && <b className={good ? styles.good : ""}>{state}</b>}</div>; }
+function Metric({ value, label }: { value: string | number; label: string }) { return <div><b>{value}</b><span>{label}</span></div>; }

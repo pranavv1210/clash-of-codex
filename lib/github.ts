@@ -67,7 +67,8 @@ function projectLabel(root: string, repoName: string) {
 }
 
 export function organizeProjects(repo: GitHubRepo, entries: RepoFile[], commitCount = 0): Project[] {
-  const files = entries.filter((entry) => entry.type === "blob");
+  const excluded = /(^|\/)(node_modules|\.git|dist|build|coverage|\.next|vendor|cache|\.cache)(\/|$)/i;
+  const files = entries.filter((entry) => entry.type === "blob" && !excluded.test(entry.path)).sort((a, b) => a.path.localeCompare(b.path));
   const roots = new Set<string>();
 
   for (const file of files) {
@@ -129,8 +130,9 @@ export async function getRepoSnapshot(repo: GitHubRepo) {
   } catch {
     commits = 0;
   }
-  const projects = organizeProjects(repo, tree.tree || [], commits);
-  return { files: tree.tree || [], projects, commits, truncated: tree.truncated };
+  const filteredTree = (tree.tree || []).filter((entry) => !/(^|\/)(node_modules|\.git|dist|build|coverage|\.next|vendor|cache|\.cache)(\/|$)/i.test(entry.path)).sort((a, b) => a.path.localeCompare(b.path));
+  const projects = organizeProjects(repo, filteredTree, commits);
+  return { files: filteredTree, projects, commits, truncated: tree.truncated };
 }
 
 export function formatNumber(value: number) {
