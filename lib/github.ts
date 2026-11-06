@@ -20,6 +20,13 @@ export async function getUserRepos(username: string): Promise<GitHubRepo[]> {
   return repos.filter((repo) => !repo.private);
 }
 
+export async function getAuthenticatedRepos(): Promise<GitHubRepo[]> {
+  const response = await fetch("/api/github/repos", { cache: "no-store" });
+  const body = await response.json() as { repos?: GitHubRepo[]; error?: string };
+  if (!response.ok) throw new Error(body.error || "Could not load your GitHub repositories.");
+  return body.repos || [];
+}
+
 const manifestNames = new Set([
   "package.json", "pubspec.yaml", "pyproject.toml", "requirements.txt", "Cargo.toml",
   "go.mod", "pom.xml", "build.gradle", "build.gradle.kts", "composer.json",
@@ -118,6 +125,15 @@ export function organizeProjects(repo: GitHubRepo, entries: RepoFile[], commitCo
 }
 
 export async function getRepoSnapshot(repo: GitHubRepo) {
+  const [owner, name] = repo.full_name.split("/");
+  if (owner && name) {
+    const authenticated = await fetch(`/api/github/repos/${encodeURIComponent(owner)}/${encodeURIComponent(name)}/snapshot`, { cache: "no-store" });
+    if (authenticated.ok) return authenticated.json() as Promise<{ files: RepoFile[]; projects: Project[]; commits: number; truncated: boolean }>;
+    if (repo.private) {
+      const body = await authenticated.json().catch(() => ({})) as { error?: string };
+      throw new Error(body.error || "Sign in with a GitHub account that can access this private repository.");
+    }
+  }
   const tree = await github<{ tree: RepoFile[]; truncated: boolean }>(
     `${API}/repos/${repo.full_name}/git/trees/${encodeURIComponent(repo.default_branch)}?recursive=1`
   );
