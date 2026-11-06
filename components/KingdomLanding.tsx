@@ -15,9 +15,9 @@ const KingdomScene = dynamic(() => import("@/components/KingdomScene"), {
 });
 
 const builders = [
-  { initials: "AR", name: "Architect", task: "Planning systems", color: "purple" },
-  { initials: "CD", name: "Codex Dev", task: "Ready to build", color: "green" },
-  { initials: "QA", name: "QA Scout", task: "Standing by", color: "blue" },
+  { initials: "AR", name: "Architect", task: "Role template", color: "purple" },
+  { initials: "CD", name: "Codex Dev", task: "Not connected", color: "green" },
+  { initials: "QA", name: "QA Scout", task: "Not connected", color: "blue" },
 ];
 
 export default function KingdomLanding() {
@@ -29,9 +29,9 @@ export default function KingdomLanding() {
           <span><strong>CLASH OF CODEX</strong><small>YOUR ENGINEERING KINGDOM</small></span>
         </Link>
         <div className={styles.resources}>
-          <div className={styles.resource}><span className={styles.gold}><Coins size={18} /></span><span><b>BUILD XP</b><strong>12</strong></span></div>
-          <div className={styles.resource}><span className={styles.elixir}><Zap size={18} /></span><span><b>AI ENERGY</b><strong>84</strong></span></div>
-          <div className={styles.resource}><span className={styles.builder}><Hammer size={18} /></span><span><b>BUILDERS</b><strong>4/6</strong></span></div>
+          <div className={styles.resource}><span className={styles.gold}><Coins size={18} /></span><span><b>BUILD XP</b><strong>—</strong></span></div>
+          <div className={styles.resource}><span className={styles.elixir}><Zap size={18} /></span><span><b>AI ENERGY</b><strong>SETUP</strong></span></div>
+          <div className={styles.resource}><span className={styles.builder}><Hammer size={18} /></span><span><b>BUILDERS</b><strong>0/0</strong></span></div>
         </div>
         <div className={styles.actions}>
           <Link href="/workspace" className={styles.githubButton}><Github size={17} /> CONNECT GITHUB</Link>
@@ -69,7 +69,7 @@ export default function KingdomLanding() {
 
         <motion.aside className={styles.rightStack} initial={{ x: 24, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: .55, delay: .08 }}>
           <section className={styles.panel}>
-            <div className={styles.panelTitle}><Users size={18} /><h2>YOUR BUILDERS</h2><span className={styles.count}>4/6</span></div>
+            <div className={styles.panelTitle}><Users size={18} /><h2>BUILDER ROLES</h2><span className={styles.count}>PREVIEW</span></div>
             {builders.map((builder) => (
               <div className={styles.builderRow} key={builder.initials}>
                 <span className={`${styles.builderAvatar} ${styles[builder.color]}`}>{builder.initials}</span>
@@ -82,12 +82,12 @@ export default function KingdomLanding() {
 
           <section className={styles.panel}>
             <div className={styles.panelTitle}><Sparkles size={17} /><h2>KINGDOM ACTIVITY</h2></div>
-            <div className={styles.activity}><span className={styles.activityDot} /><span><strong>Village initialized</strong><small>Waiting for your repository</small></span></div>
-            <div className={styles.activity}><span className={styles.activityDotMuted} /><span><strong>AI crew assembled</strong><small>Ready for configuration</small></span></div>
+            <div className={styles.activity}><span className={styles.activityDot} /><span><strong>Kingdom preview loaded</strong><small>Connect GitHub to create your world</small></span></div>
+            <div className={styles.activity}><span className={styles.activityDotMuted} /><span><strong>Agent roles available</strong><small>No agent sessions running</small></span></div>
           </section>
         </motion.aside>
 
-        <div className={styles.cityCaption}><span className={styles.live} /> YOUR KINGDOM · LIVE WORLD PREVIEW</div>
+        <div className={styles.cityCaption}><span className={styles.live} /> YOUR KINGDOM · VISUAL PREVIEW</div>
         <div className={styles.sceneHint}>DRAG TO ORBIT <i /> SCROLL TO ZOOM <i /> SELECT A BUILDING</div>
       </section>
 
