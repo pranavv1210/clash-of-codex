@@ -20,3 +20,9 @@ export type CityExecutionEvent = {
 
 export type PermissionMode = "ask-mayor" | "auto-safe" | "manual";
 export type MissionState = "queued" | "planning" | "exploring" | "building" | "awaiting-approval" | "testing" | "reviewing" | "completed" | "failed" | "halted";
+
+export type RuntimeDiagnostics = {
+  codex: { configured: boolean; reachable: boolean; mode: "app-server" | "agents-api" | "unconfigured"; message: string };
+  github: { oauthConfigured: boolean; publicDiscovery: boolean };
+  persistence: { configured: boolean; driver: string };
+};

@@ -16,6 +16,7 @@ Codex City turns a public GitHub repository into an interactive isometric softwa
 - Persistent connected-repository restoration through browser storage
 - Responsive desktop and mobile HUD layouts
 - Typed execution-event, permission, and mission contracts for a future backend adapter
+- Server-only runtime diagnostics for Codex app-server, GitHub OAuth, and database configuration
 
 ## Honest integration boundaries
 
@@ -37,3 +38,9 @@ npm run build
 ```
 
 The production build exposes `/` as Codex City and preserves the earlier repository workspace at `/workspace`.
+
+## Runtime configuration
+
+Copy `.env.example` to `.env.local` for local development. Codex City prefers a server-side Codex app-server gateway for product integrations that need persistent threads, streaming, interruption, and approval handling. The `/api/runtime/status` endpoint performs a real health check and never exposes credentials to the browser.
+
+Until a compatible gateway implements mission transport and permission callbacks, dispatch remains disabled even when the health endpoint is reachable. This avoids representing a diagnostic connection as a working execution engine.
