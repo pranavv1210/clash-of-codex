@@ -1,5 +1,5 @@
-import InceptownApp from "@/components/InceptownApp";
+import KingdomLanding from "@/components/KingdomLanding";
 
 export default function Home() {
-  return <InceptownApp />;
+  return <KingdomLanding />;
 }
