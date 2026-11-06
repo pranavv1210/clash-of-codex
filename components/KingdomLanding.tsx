@@ -4,13 +4,13 @@ import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import {
   ArrowRight, Bot, CheckCircle2, ChevronRight, Code2, Coins, Github,
-  Hammer, Layers3, Rocket, Settings, Shield, Sparkles, Swords, Target, Users, Zap
+  Hammer, Layers3, Settings, Sparkles, Swords, Target, Users, Zap
 } from "lucide-react";
 import Link from "next/link";
 import styles from "./KingdomLanding.module.css";
 import type { Project } from "@/types/inceptown";
 
-const CityScene = dynamic(() => import("@/components/CityScene"), {
+const KingdomScene = dynamic(() => import("@/components/KingdomScene"), {
   ssr: false,
   loading: () => <div className={styles.sceneLoading}>Raising the kingdom…</div>,
 });
@@ -50,7 +50,7 @@ export default function KingdomLanding() {
       <section className={styles.world}>
         <div className={styles.skyGlow} />
         <div className={styles.scene}>
-          <CityScene projects={demoProjects} compact />
+          <KingdomScene />
         </div>
         <div className={styles.worldVignette} />
 
