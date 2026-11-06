@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { OAUTH_STATE_COOKIE, secureCookie } from "@/lib/auth";
 
 export async function GET() {
-  const clientId = process.env.GITHUB_CLIENT_ID;
+  const clientId = process.env.GITHUB_CLIENT_ID?.trim();
   if (!clientId) return NextResponse.json({ error: "GitHub OAuth is not configured." }, { status: 503 });
   const state = randomBytes(24).toString("base64url");
   const authorize = new URL("https://github.com/login/oauth/authorize");

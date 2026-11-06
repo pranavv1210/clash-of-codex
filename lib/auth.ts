@@ -17,7 +17,7 @@ type AuthSession = { accessToken: string; user: GitHubViewer; createdAt: number 
 function key() {
   const secret = process.env.SESSION_SECRET;
   if (!secret) throw new Error("SESSION_SECRET is not configured.");
-  return createHash("sha256").update(secret).digest();
+  return createHash("sha256").update(secret.trim()).digest();
 }
 
 export function sealSession(session: AuthSession) {
