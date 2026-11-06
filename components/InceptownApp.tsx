@@ -6,7 +6,8 @@ import {
   ArrowLeft, ArrowRight, ArrowUpRight, Bot, Box, Check, ChevronDown, ChevronRight,
   CircleHelp, Clock3, Code2, Command, Compass, Cpu, ExternalLink, FileCode2, FileText, Folder,
   GitBranch, Github, Globe2, Layers3, LayoutDashboard, LoaderCircle, LockKeyhole,
-  MoreHorizontal, Plus, Rocket, Settings2, ShieldCheck, Sparkles, TerminalSquare, X, Zap
+  MoreHorizontal, Plus, Rocket, Settings2, ShieldCheck, Sparkles, TerminalSquare, X, Zap,
+  Coins, FlaskConical, Hammer, Map as MapIcon, ScrollText, Users
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
@@ -55,6 +56,27 @@ function Brand({ onClick }: { onClick?: () => void }) {
 
 function Stat({ icon: Icon, label, value }: { icon: typeof GitBranch; label: string; value: string | number }) {
   return <div className="stat"><Icon size={14} /><span>{value}</span><small>{label}</small></div>;
+}
+
+function KingdomHUD({ repoName, commits, files, districts }: { repoName: string; commits: number; files: number; districts: number }) {
+  return <div className="kingdom-hud" aria-label="Kingdom repository metrics">
+    <div className="kingdom-identity"><span className="kingdom-shield"><Code2 size={16} /></span><span><strong>{repoName}</strong><small>Codex Town Hall</small></span></div>
+    <div className="kingdom-resources">
+      <div className="resource-pill resource-gold"><span><Coins size={15} /></span><strong>{formatNumber(commits)}</strong><small>commits</small></div>
+      <div className="resource-pill resource-elixir"><span><FlaskConical size={15} /></span><strong>{formatNumber(files)}</strong><small>files</small></div>
+      <div className="resource-pill resource-builder"><span><Hammer size={15} /></span><strong>{districts}</strong><small>districts</small></div>
+    </div>
+  </div>;
+}
+
+function VillageDock({ tab, onTab, onConsole }: { tab: "overview" | "companies" | "missions"; onTab: (tab: "overview" | "companies" | "missions") => void; onConsole: () => void }) {
+  return <nav className="village-dock" aria-label="Kingdom navigation">
+    <button className={tab === "overview" ? "active" : ""} onClick={() => onTab("overview")}><MapIcon size={18} /><span>Village</span></button>
+    <button className={tab === "companies" ? "active" : ""} onClick={() => onTab("companies")}><Layers3 size={18} /><span>Projects</span></button>
+    <button className={tab === "missions" ? "active" : ""} onClick={() => onTab("missions")}><ScrollText size={18} /><span>Missions</span></button>
+    <button onClick={onConsole}><TerminalSquare size={18} /><span>Code</span></button>
+    <button onClick={() => onTab("companies")}><Users size={18} /><span>Crew</span></button>
+  </nav>;
 }
 
 function RepoCard({ repo, onBuild }: { repo: GitHubRepo; onBuild: () => void }) {
@@ -521,6 +543,7 @@ export default function InceptownApp() {
               <div className="city-stats"><Stat icon={Layers3} label="companies" value={projects.length} /><Stat icon={FileCode2} label="files mapped" value={formatNumber(allFiles.filter((f) => f.type === "blob").length)} /><Stat icon={GitBranch} label="commits" value={commitCount ? formatNumber(commitCount) : "—"} /><Stat icon={Code2} label="languages" value={allLanguages.length || "—"} /></div>
               {tab === "overview" && <>
                 <div className="city-board">
+                  <KingdomHUD repoName={selectedRepo.name} commits={commitCount} files={allFiles.filter((file) => file.type === "blob").length} districts={projects.length} />
                   <div className="board-top"><div><span className="board-eyebrow"><span className="live-dot" /> CITY VIEW</span><h2>The skyline</h2><p>Each tower is a project. Taller buildings reflect larger codebases.</p></div><div className="board-tools"><span><span className="legend-dot mint-dot" /> Selected company</span><span><span className="legend-dot blue-dot" /> Source file</span><button className="icon-button" onClick={() => setTerminalOpen(true)}><TerminalSquare size={15} /></button></div></div>
                   <CityScene projects={projects} selectedProjectId={selectedProject?.id} selectedFilePath={selectedFilePath} onSelect={(id) => { setSelectedProjectId(id); setSelectedFilePath(""); setFloorOpen(0); setTab("overview"); }} onSelectFile={inspectFile} />
                   <div className="board-bottom"><span><Compass size={14} /> Drag to orbit · Scroll to zoom · Select a building to inspect</span><span>{projects.length} DISTRICTS MAPPED</span></div>
@@ -537,6 +560,7 @@ export default function InceptownApp() {
                     </div>
                   </aside>}
                   {selectedProject && <div className="city-crew-hud"><CrewBlueprint projectName={selectedProject.name} onConfigure={() => setSettingsOpen(true)} /></div>}
+                  <VillageDock tab={tab} onTab={setTab} onConsole={() => setTerminalOpen(true)} />
 
                 </div>
                 <div className="overview-lower">

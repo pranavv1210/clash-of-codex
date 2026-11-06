@@ -148,12 +148,50 @@ function Tree({ position, scale = 1 }: { position: [number, number, number]; sca
   </group>;
 }
 
+function Cloud({ position, scale = 1, speed = 0.35 }: { position: [number, number, number]; scale?: number; speed?: number }) {
+  const ref = useRef<Group>(null);
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    ref.current.position.x = position[0] + Math.sin(clock.getElapsedTime() * speed) * 8;
+  });
+  return <group ref={ref} position={position} scale={scale}>
+    {[[-1, 0, 0], [0, .25, 0], [1, 0, 0], [.15, -.1, .25]].map((p, i) => <mesh key={i} position={p as [number, number, number]}><sphereGeometry args={[1.15, 12, 8]} /><meshStandardMaterial color="#FFF9E8" transparent opacity={.82} roughness={1} /></mesh>)}
+  </group>;
+}
+
+function Smoke({ position }: { position: [number, number, number] }) {
+  const ref = useRef<Group>(null);
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const t = clock.getElapsedTime();
+    ref.current.position.y = position[1] + (t * .28) % 2.2;
+    ref.current.position.x = position[0] + Math.sin(t * .7) * .22;
+  });
+  return <group ref={ref} position={position}>{[0, .42, .82].map((y, i) => <mesh key={y} position={[i * .08, y, 0]} scale={1 + i * .32}><sphereGeometry args={[.22, 10, 8]} /><meshStandardMaterial color="#F2EAD8" transparent opacity={.34 - i * .07} /></mesh>)}</group>;
+}
+
+function ForestRing({ width, depth }: { width: number; depth: number }) {
+  const trees = useMemo(() => Array.from({ length: 48 }, (_, i) => {
+    const side = i % 4;
+    const along = ((Math.floor(i / 4) / 11) - .5) * (side < 2 ? width + 18 : depth + 18);
+    return side === 0 ? [-width / 2 - 7, .02, along] : side === 1 ? [width / 2 + 7, .02, along] : side === 2 ? [along, .02, -depth / 2 - 7] : [along, .02, depth / 2 + 7];
+  }) as [number, number, number][], [width, depth]);
+  return <>{trees.map((position, i) => <Tree key={i} position={position} scale={.9 + (i % 5) * .13} />)}</>;
+}
+
 function CodexMonument() {
   return <group position={[0, 0, 0]}>
-    <mesh position={[0, 0.18, 0]} receiveShadow><cylinderGeometry args={[2.4, 2.8, 0.36, 8]} /><meshStandardMaterial color="#D6D0C2" /></mesh>
-    <mesh position={[0, 1.25, 0]} castShadow><cylinderGeometry args={[0.65, 0.9, 2.2, 8]} /><meshStandardMaterial color="#F7F5EC" roughness={0.7} /></mesh>
-    <mesh position={[0, 2.55, 0]} castShadow rotation={[0, Math.PI / 4, 0]}><octahedronGeometry args={[1.05]} /><meshStandardMaterial color="#F3BE45" emissive="#D99A29" emissiveIntensity={0.16} /></mesh>
-    <Html position={[0, 3.9, 0]} center distanceFactor={25} style={{ pointerEvents: "none" }}><div className="city-company-sign"><strong>Codex Beacon</strong><span>ENGINEERING KINGDOM</span></div></Html>
+    <mesh position={[0, 0.22, 0]} receiveShadow><cylinderGeometry args={[3.8, 4.3, 0.44, 8]} /><meshStandardMaterial color="#B9B5A7" /></mesh>
+    <mesh position={[0, 1.8, 0]} castShadow><boxGeometry args={[5.4, 3.2, 4.7]} /><meshStandardMaterial color="#FFF0CB" roughness={.82} /></mesh>
+    {[-2.3, 2.3].map((x) => <group key={x} position={[x, 2.45, 0]}><mesh castShadow><boxGeometry args={[1.35, 4.5, 1.55]} /><meshStandardMaterial color="#E0DCCD" /></mesh><mesh position={[0, 2.55, 0]} rotation={[0, Math.PI / 4, 0]} castShadow><coneGeometry args={[1.25, 1.4, 4]} /><meshStandardMaterial color="#287A43" /></mesh></group>)}
+    <mesh position={[0, 3.85, 0]} castShadow rotation={[0, Math.PI / 4, 0]}><coneGeometry args={[3.15, 2.3, 4]} /><meshStandardMaterial color="#89512F" roughness={.78} /></mesh>
+    <mesh position={[0, 1.42, 2.38]} castShadow><boxGeometry args={[1.25, 2.2, .16]} /><meshStandardMaterial color="#57351F" /></mesh>
+    <mesh position={[0, 2.9, 2.52]} castShadow><octahedronGeometry args={[.72]} /><meshStandardMaterial color="#F7C844" emissive="#D99A20" emissiveIntensity={.18} /></mesh>
+    {[-1.55, 1.55].map((x) => <mesh key={x} position={[x, 2.05, 2.4]}><boxGeometry args={[.65, .78, .08]} /><meshBasicMaterial color="#FFD978" /></mesh>)}
+    <mesh position={[1.45, 5.25, 0]}><cylinderGeometry args={[.07, .07, 2.2, 8]} /><meshStandardMaterial color="#57351F" /></mesh>
+    <mesh position={[2.05, 5.75, 0]} rotation={[0, Math.PI / 2, 0]}><planeGeometry args={[1.2, .75]} /><meshStandardMaterial color="#E46BB9" side={THREE.DoubleSide} /></mesh>
+    <Smoke position={[-1.6, 4.7, -.7]} />
+    <Html position={[0, 6.4, 0]} center distanceFactor={25} style={{ pointerEvents: "none" }}><div className="city-company-sign town-hall-sign"><strong>Codex Town Hall</strong><span>REPOSITORY COMMAND</span></div></Html>
   </group>;
 }
 
@@ -269,9 +307,13 @@ function Scene({ projects, selectedProjectId, selectedFilePath, onSelect, onSele
     <ambientLight intensity={1.5} />
     <hemisphereLight args={["#F8FCF6", "#739C77", 1.2]} />
     <directionalLight position={[34, 54, 22]} intensity={2.5} castShadow shadow-mapSize={[2048, 2048]} />
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.43, 0]} receiveShadow><planeGeometry args={[width + 150, depth + 150]} /><meshStandardMaterial color="#A4C99B" roughness={1} /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.56, 0]} receiveShadow><planeGeometry args={[width + 170, depth + 170]} /><meshStandardMaterial color="#37A9DF" roughness={.65} metalness={.08} /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.43, 0]} receiveShadow><boxGeometry args={[width + 35, depth + 35, .28]} /><meshStandardMaterial color="#72BD45" roughness={1} /></mesh>
     <RoadNetwork columns={columns} rows={rows} />
-    <CodexMonument />
+    <group position={[0, 0, -depth / 2 - 2]}><CodexMonument /></group>
+    <ForestRing width={width} depth={depth} />
+    <Cloud position={[-22, 18, -18]} scale={2.2} />
+    <Cloud position={[25, 22, 12]} scale={1.6} speed={.22} />
     {visible.map((project, index) => <District key={project.id} project={project} index={index} columns={columns} total={visible.length} selectedProjectId={selectedProjectId} selectedFilePath={selectedFilePath} onSelect={onSelect} onSelectFile={onSelectFile} />)}
     {people.map((person, index) => <Person key={index} {...person} />)}
     <TrafficCar lane={trafficLane - 0.72} color="#E1A45E" delay={0.06} />

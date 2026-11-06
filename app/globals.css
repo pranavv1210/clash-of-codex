@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Lilita+One&family=Nunito:wght@400;500;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -33,7 +33,7 @@
   --mint:#218A69;--violet:#7B72B6;--amber:#C9863E;
   --paper:#F4F1E8;--white:#FFFEFA;--muted:#718078;
   --line:rgba(42,62,51,.14);--text:#26372F;
-  --font-display:'Space Grotesk',sans-serif;--font-body:'Inter',sans-serif;--font-mono:'DM Mono',monospace
+  --font-display:'Lilita One',sans-serif;--font-body:'Nunito',sans-serif;--font-mono:'JetBrains Mono',monospace
 }
 html,body{background:#F4F1E8;color:#26372F}
 body{color:#26372F}
@@ -534,3 +534,18 @@ body:not(:has(.workspace)) .construction-block{background:#9BBDB0;border-color:r
 .announcement,.section-kicker,.eyebrow,.repo-card-action,.subtle-link{color:#287A43}.hero h1 em,.page-heading h1 em,.closing-cta h2 em{color:#287A43!important}
 .workspace-scroll:has(.city-board) .prompt-panel{border-color:rgba(243,190,69,.45);box-shadow:0 12px 34px rgba(23,76,50,.14),0 0 0 3px rgba(243,190,69,.08)}
 @media(max-width:600px){.brand{font-size:16px}.brand>span:last-child small{font-size:7px}}
+
+/* Village-edge HUD: real repository metrics in a strategy-game silhouette. */
+.kingdom-hud{position:absolute;z-index:34;top:16px;left:16px;right:16px;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none}
+.kingdom-identity,.resource-pill{pointer-events:auto;border:2px solid rgba(87,53,31,.24);background:linear-gradient(#FFF9E8,#FFF0CB);box-shadow:0 4px 0 rgba(87,53,31,.22),0 9px 20px rgba(55,74,44,.16)}
+.kingdom-identity{display:flex;align-items:center;gap:9px;padding:7px 12px 7px 7px;border-radius:14px;transform:rotate(-.35deg)}
+.kingdom-shield{width:34px;height:38px;display:grid;place-items:center;color:#fff;background:linear-gradient(145deg,#438B32,#245B2C);clip-path:polygon(50% 0,94% 17%,87% 72%,50% 100%,13% 72%,6% 17%)}
+.kingdom-identity strong,.kingdom-identity small{display:block}.kingdom-identity strong{font:17px var(--font-display);color:#493729;letter-spacing:.1px}.kingdom-identity small{font:600 8px var(--font-body);color:#8B735E}
+.kingdom-resources{display:flex;gap:8px}.resource-pill{min-width:94px;height:42px;display:grid;grid-template-columns:28px 1fr;grid-template-rows:1fr 1fr;align-items:center;padding:3px 9px 3px 5px;border-radius:12px}
+.resource-pill>span{grid-row:1/3;width:27px;height:27px;display:grid;place-items:center;border-radius:50%;color:#fff;box-shadow:inset 0 -2px 0 rgba(0,0,0,.18)}.resource-pill strong{align-self:end;font:15px var(--font-display);line-height:1;color:#493729}.resource-pill small{align-self:start;font:700 7px var(--font-body);color:#8B735E}.resource-gold>span{background:linear-gradient(#FFD95D,#D99A20)}.resource-elixir>span{background:linear-gradient(#F48CCC,#8953C7)}.resource-builder>span{background:linear-gradient(#83D2F5,#2E89BC)}
+.village-dock{position:absolute;z-index:36;left:50%;bottom:17px;transform:translateX(-50%);display:flex;gap:5px;padding:6px;border:2px solid rgba(87,53,31,.28);border-radius:18px;background:linear-gradient(#FFF9E8,#E0DCCD);box-shadow:0 5px 0 rgba(87,53,31,.23),0 12px 25px rgba(55,74,44,.19)}
+.village-dock button{min-width:58px;height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;border-radius:11px;background:transparent;color:#76604D;font:800 8px var(--font-body)}.village-dock button:hover,.village-dock button.active{color:#fff;background:linear-gradient(#72BD45,#438B32);box-shadow:inset 0 -3px 0 rgba(36,91,44,.45),0 3px 7px rgba(67,139,50,.22)}
+.town-hall-sign{border:2px solid rgba(87,53,31,.28)!important;background:linear-gradient(#FFF4D8,#E0DCCD)!important;box-shadow:0 4px 0 rgba(87,53,31,.2),0 8px 16px rgba(0,0,0,.13)!important}.town-hall-sign strong{font:12px var(--font-display)!important;color:#493729!important}.town-hall-sign span{color:#89512F!important}
+.workspace-scroll:has(.city-board) .prompt-panel{bottom:88px}.workspace-scroll:has(.city-board) .overview-lower{bottom:88px}
+@media(max-width:850px){.kingdom-hud{top:58px;left:9px;right:9px}.kingdom-identity{padding:5px 8px 5px 5px}.kingdom-shield{width:28px;height:31px}.kingdom-identity strong{font-size:13px}.kingdom-resources{gap:4px}.resource-pill{min-width:55px;width:55px;height:35px;grid-template-columns:21px 1fr;padding:2px 4px}.resource-pill>span{width:21px;height:21px}.resource-pill strong{font-size:11px}.resource-pill small{display:none}.village-dock{bottom:11px}.village-dock button{min-width:48px;height:42px}.workspace-scroll:has(.city-board) .overview-lower{bottom:72px}.workspace-scroll:has(.city-board) .prompt-panel{bottom:158px}.workspace-scroll:has(.city-board) .city-canvas-hint{display:none}}
+@media(max-width:480px){.kingdom-identity small{display:none}.resource-builder{display:none}.village-dock{width:calc(100% - 18px);justify-content:space-around}.village-dock button{min-width:45px}.workspace-scroll:has(.city-board) .prompt-panel{bottom:151px}.workspace-scroll:has(.city-board) .overview-lower{bottom:69px}}
