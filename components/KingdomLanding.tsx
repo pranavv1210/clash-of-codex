@@ -30,6 +30,11 @@ export default function KingdomLanding() {
 
   useEffect(() => { void (async () => {
     try {
+      const oauthResult = new URLSearchParams(window.location.search).get("github");
+      if (oauthResult) {
+        setError(oauthResult === "invalid-state" ? "GitHub sign-in expired. Start the connection again." : "GitHub could not complete sign-in. Check the OAuth callback and try again.");
+        window.history.replaceState({}, "", window.location.pathname);
+      }
       const response = await fetch("/api/auth/session", { cache: "no-store" });
       const session = await response.json() as { user: GitHubViewer | null };
       setViewer(session.user);
@@ -44,6 +49,9 @@ export default function KingdomLanding() {
   async function openCity(next: GitHubRepo, restoring = false) { setBusy(true); setError(""); setRepo(next); try { const snapshot = await getRepoSnapshot(next); setFiles(snapshot.files); setProjects(snapshot.projects); setCommits(snapshot.commits); setSelectedProjectId(snapshot.projects[0]?.id || ""); localStorage.setItem("codex-city:repo:v1", JSON.stringify(next)); transmit(restoring ? "CITY RESTORED" : "REPOSITORY SCANNED", `${snapshot.files.length} structures mapped from ${next.default_branch}`); } catch (cause) { setRepo(null); setError(cause instanceof Error ? cause.message : "Repository scan failed."); } finally { setBusy(false); } }
   function inspectFile(projectId: string, path: string) { setSelectedProjectId(projectId); setSelectedFilePath(path); transmit("FILE INSPECTED", path); }
   function chooseFile(file: RepoFile) { const project = projects.find((item) => item.files.some((candidate) => candidate.path === file.path)); if (project) inspectFile(project.id, file.path); setSearchOpen(false); setQuery(""); }
+
+  if (authLoading) return <AuthGate loading />;
+  if (!viewer) return <AuthGate error={error} />;
 
   return <main className={styles.cityShell}>
     <div className={styles.cityStage}><CityScene projects={projects} selectedProjectId={selectedProjectId} selectedFilePath={selectedFilePath} onSelect={(id) => { setSelectedProjectId(id); setSelectedFilePath(""); }} onSelectFile={inspectFile} />{!repo && <div className={styles.disconnected}><MapIcon /><strong>NO CITY CONNECTED</strong><small>Connect a public GitHub repository to generate a real city.</small></div>}</div>
@@ -63,3 +71,22 @@ export default function KingdomLanding() {
 
 function Title({ icon, label, state, good, action }: { icon?: React.ReactNode; label: string; state?: string; good?: boolean; action?: () => void }) { return <div className={styles.title}><span>{icon}{label}</span>{action ? <button onClick={action}><X /></button> : state && <b className={good ? styles.good : ""}>{state}</b>}</div>; }
 function Metric({ value, label }: { value: string | number; label: string }) { return <div><b>{value}</b><span>{label}</span></div>; }
+
+function AuthGate({ loading = false, error = "" }: { loading?: boolean; error?: string }) {
+  return <main className={styles.gate}>
+    <div className={styles.gateGrid} aria-hidden="true"><span /><span /><span /><span /><span /></div>
+    <div className={styles.gateBeacon} aria-hidden="true"><i /><i /><i /></div>
+    <header className={styles.gateBrand}><span><Code2 /></span><div><strong>Codex City</strong><small>Software operations kingdom</small></div><b>GATE 01</b></header>
+    <section className={styles.gateCard} aria-busy={loading}>
+      <div className={styles.gateCrest}><Github /></div>
+      <p className={styles.gateSignal}>{loading ? "Verifying city passport" : "The city gates are closed"}</p>
+      <h1>{loading ? "Checking your GitHub session…" : "Enter with GitHub"}</h1>
+      <p className={styles.gateCopy}>{loading ? "Your city opens automatically when the session is ready." : "Sign in to discover repositories you can access, choose a codebase, and generate your own engineering city."}</p>
+      {error && <p className={styles.gateError}>{error}</p>}
+      {loading ? <div className={styles.gateLoading}><LoaderCircle /> CONTACTING GITHUB</div> : <a className={styles.gateEnter} href="/api/auth/github"><Github /> SIGN IN AND ENTER CITY</a>}
+      <div className={styles.gateRules}><span><ShieldAlert /> Encrypted session</span><span><FileCode2 /> Read-only scans</span><span><MapIcon /> Your repositories</span></div>
+    </section>
+    <aside className={styles.gateStatus}><strong>World status</strong><span><i /> GitHub gateway ready</span><span><i /> Private cities supported</span><span><i /> Personal sessions isolated</span></aside>
+    <footer className={styles.gateFooter}><span>CODEX CITY · MAYOR ACCESS TERMINAL</span><span>Every mayor enters their own city.</span></footer>
+  </main>;
+}
