@@ -117,11 +117,23 @@ function CompanyHQ({ project, selected, onSelect }: { project: Project; selected
         <boxGeometry args={[3.5, 0.24, 3.12]} />
         <meshStandardMaterial color={accent} roughness={0.65} />
       </mesh>
-      <mesh position={[0, height + 0.82, 0]}>
+      <mesh position={[0, height + 0.82, 0]} castShadow rotation={[0, Math.PI / 4, 0]}>
+        <coneGeometry args={[1.35, 0.75, 4]} />
+        <meshStandardMaterial color="#174C32" roughness={0.72} />
+      </mesh>
+      <mesh position={[0, 0.92, 1.38]} castShadow>
+        <boxGeometry args={[0.7, 1.05, 0.08]} />
+        <meshStandardMaterial color="#5B3C28" roughness={0.9} />
+      </mesh>
+      {[-1.22, 1.22].map((x) => <group key={x} position={[x, height - 0.3, 1.43]}>
+        <mesh><boxGeometry args={[0.05, 1.05, 0.05]} /><meshStandardMaterial color="#E8D4A1" /></mesh>
+        <mesh position={[x < 0 ? 0.22 : -0.22, 0.18, 0]}><planeGeometry args={[0.42, 0.62]} /><meshStandardMaterial color={x < 0 ? "#F3BE45" : "#287A43"} side={THREE.DoubleSide} /></mesh>
+      </group>)}
+      <mesh position={[0, height + 1.28, 0]}>
         <cylinderGeometry args={[0.12, 0.12, 0.55, 8]} />
         <meshStandardMaterial color="#E9B65D" emissive="#E9B65D" emissiveIntensity={0.3} />
       </mesh>
-      <Html position={[0, height + 1.16, 0]} center distanceFactor={23} style={{ pointerEvents: "none" }}>
+      <Html position={[0, height + 1.72, 0]} center distanceFactor={23} style={{ pointerEvents: "none" }}>
         <div className="city-company-sign"><strong>{project.name}</strong><span>COMPANY HQ · {project.files.length} FILES</span></div>
       </Html>
     </group>
@@ -133,6 +145,15 @@ function Tree({ position, scale = 1 }: { position: [number, number, number]; sca
     <mesh position={[0, 0.42, 0]} castShadow><cylinderGeometry args={[0.09, 0.13, 0.82, 7]} /><meshStandardMaterial color="#98734E" /></mesh>
     <mesh position={[0, 1.05, 0]} castShadow><icosahedronGeometry args={[0.56, 1]} /><meshStandardMaterial color="#5D9968" roughness={1} /></mesh>
     <mesh position={[-0.22, 1.3, 0.05]} castShadow><icosahedronGeometry args={[0.34, 1]} /><meshStandardMaterial color="#7CB27B" roughness={1} /></mesh>
+  </group>;
+}
+
+function CodexMonument() {
+  return <group position={[0, 0, 0]}>
+    <mesh position={[0, 0.18, 0]} receiveShadow><cylinderGeometry args={[2.4, 2.8, 0.36, 8]} /><meshStandardMaterial color="#D6D0C2" /></mesh>
+    <mesh position={[0, 1.25, 0]} castShadow><cylinderGeometry args={[0.65, 0.9, 2.2, 8]} /><meshStandardMaterial color="#F7F5EC" roughness={0.7} /></mesh>
+    <mesh position={[0, 2.55, 0]} castShadow rotation={[0, Math.PI / 4, 0]}><octahedronGeometry args={[1.05]} /><meshStandardMaterial color="#F3BE45" emissive="#D99A29" emissiveIntensity={0.16} /></mesh>
+    <Html position={[0, 3.9, 0]} center distanceFactor={25} style={{ pointerEvents: "none" }}><div className="city-company-sign"><strong>Codex Beacon</strong><span>ENGINEERING KINGDOM</span></div></Html>
   </group>;
 }
 
@@ -250,6 +271,7 @@ function Scene({ projects, selectedProjectId, selectedFilePath, onSelect, onSele
     <directionalLight position={[34, 54, 22]} intensity={2.5} castShadow shadow-mapSize={[2048, 2048]} />
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.43, 0]} receiveShadow><planeGeometry args={[width + 150, depth + 150]} /><meshStandardMaterial color="#A4C99B" roughness={1} /></mesh>
     <RoadNetwork columns={columns} rows={rows} />
+    <CodexMonument />
     {visible.map((project, index) => <District key={project.id} project={project} index={index} columns={columns} total={visible.length} selectedProjectId={selectedProjectId} selectedFilePath={selectedFilePath} onSelect={onSelect} onSelectFile={onSelectFile} />)}
     {people.map((person, index) => <Person key={index} {...person} />)}
     <TrafficCar lane={trafficLane - 0.72} color="#E1A45E" delay={0.06} />

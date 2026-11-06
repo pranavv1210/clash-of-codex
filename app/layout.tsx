@@ -2,14 +2,14 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Inceptown — Give your ideas a world of their own",
-  description: "Turn your GitHub repositories into living startup cities. Organize projects, explore your codebase and prepare your AI engineering crew.",
-  applicationName: "Inceptown",
+  title: "Clash of Codex — Your AI engineering kingdom",
+  description: "Turn a GitHub repository into a living technology kingdom. Explore projects, inspect code and command your AI engineering crew.",
+  applicationName: "Clash of Codex",
   icons: { icon: "/favicon.svg" },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F4F1E8",
+  themeColor: "#F7F5EC",
   width: "device-width",
   initialScale: 1,
 };

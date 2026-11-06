@@ -1,8 +1,8 @@
-# Inceptown
+# Clash of Codex
 
 **Your ideas deserve a world of their own.**
 
-Inceptown turns a GitHub repository into an explorable startup city. A repository is the city, detected project roots become companies, and source files become the buildings inside each company district.
+Clash of Codex turns a GitHub repository into an explorable startup city. A repository is the city, detected project roots become companies, and source files become the buildings inside each company district.
 
 ## The city
 
@@ -63,4 +63,4 @@ This Vercel-ready milestone reads public GitHub repository metadata and file tre
 
 `GitHub repository → City → Companies (projects) → Departments → AI employees → Missions`
 
-A detected project grouping is a proposal based on repository manifests. Inceptown does not move or rewrite source files during discovery.
+A detected project grouping is a proposal based on repository manifests. Clash of Codex does not move or rewrite source files during discovery.

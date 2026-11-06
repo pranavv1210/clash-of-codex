@@ -50,7 +50,7 @@ function getFloors(files: RepoFile[]): Floor[] {
 }
 
 function Brand({ onClick }: { onClick?: () => void }) {
-  return <button className="brand" onClick={onClick} aria-label="Inceptown home"><span className="brand-mark"><span /><span /><span /></span><span>inceptown<span className="brand-period">.</span></span></button>;
+  return <button className="brand" onClick={onClick} aria-label="Clash of Codex home"><span className="brand-mark"><span /><span /><span /></span><span>Clash <small>of</small> Codex</span></button>;
 }
 
 function Stat({ icon: Icon, label, value }: { icon: typeof GitBranch; label: string; value: string | number }) {
@@ -143,7 +143,7 @@ export default function InceptownApp() {
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [terminalInput, setTerminalInput] = useState("");
   const [terminalBusy, setTerminalBusy] = useState(false);
-  const [terminalLines, setTerminalLines] = useState<string[]>(["INCEPTOWN INSPECTOR v0.1", "Read-only repository console. Type 'help' to see available commands.", ""]);
+  const [terminalLines, setTerminalLines] = useState<string[]>(["CLASH OF CODEX INSPECTOR v1.0", "Read-only repository console. Type 'help' to see available commands.", ""]);
   const [provider, setProvider] = useState("OpenAI");
   const [model, setModel] = useState("GPT-4.1");
   const [cityName, setCityName] = useState("");
@@ -163,7 +163,7 @@ export default function InceptownApp() {
     let cancelled = false;
     async function restoreWorkspace() {
       try {
-        const raw = window.localStorage.getItem("inceptown:workspace:v1");
+        const raw = window.localStorage.getItem("clash-of-codex:workspace:v1");
         if (!raw) return;
         const saved = JSON.parse(raw) as {
           repo?: GitHubRepo; cityName?: string; missions?: Mission[]; selectedProjectId?: string;
@@ -220,7 +220,7 @@ export default function InceptownApp() {
     if (view !== "city" || !selectedRepo) return;
     const manualCompanies = projects.filter((project) => project.id.startsWith("manual-")).map(({ id, name, root, color }) => ({ id, name, root, color }));
     try {
-      window.localStorage.setItem("inceptown:workspace:v1", JSON.stringify({
+      window.localStorage.setItem("clash-of-codex:workspace:v1", JSON.stringify({
         repo: selectedRepo, cityName, missions, selectedProjectId, provider, model, manualCompanies,
       }));
     } catch {
@@ -342,7 +342,7 @@ export default function InceptownApp() {
     const argument = rest.join(" ").trim();
     setTerminalInput("");
     setTerminalBusy(true);
-    setTerminalLines((current) => [...current, `inceptown $ ${command}`]);
+    setTerminalLines((current) => [...current, `codex@kingdom $ ${command}`]);
     let output = "";
     try {
       if (verb === "help") {
@@ -439,7 +439,7 @@ export default function InceptownApp() {
         <nav className="topnav">
           <a href="#how-it-works">How it works</a>
           <a href="#world">The world</a>
-          <a href="https://github.com/pranavv1210/inceptown" target="_blank" rel="noreferrer"><Github size={15} /> GitHub</a>
+          <a href="https://github.com/pranavv1210/clash-of-codex" target="_blank" rel="noreferrer"><Github size={15} /> GitHub</a>
         </nav>
         <div className="topbar-right">
           {view === "city" ? <><button className="icon-button" onClick={() => setTerminalOpen(true)} title="Open inspector"><TerminalSquare size={17} /></button><button className="icon-button" onClick={() => setSettingsOpen(true)} title="Settings"><Settings2 size={17} /></button><span className="avatar">P</span></> : <a className="text-link" href="https://github.com/pranavv1210" target="_blank" rel="noreferrer">Made for makers <ArrowUpRight size={14} /></a>}
@@ -451,11 +451,11 @@ export default function InceptownApp() {
           <section className="hero">
             <div className="hero-copy">
               <div className="announcement"><span className="announcement-dot" /> A NEW WAY TO BUILD SOFTWARE <ArrowUpRight size={13} /></div>
-              <h1>Your ideas deserve<br />a <em>world</em> of their own.</h1>
-              <p className="hero-subtitle">Turn your GitHub repositories into living startup cities. Explore your projects, bring your AI crew together, and watch your ideas take shape.</p>
+              <h1>Your code deserves<br />a <em>kingdom</em> of its own.</h1>
+              <p className="hero-subtitle">Turn a GitHub repository into a living engineering kingdom. Explore its architecture, inspect real files, and prepare a specialist AI crew for the work ahead.</p>
               <form className="username-form" onSubmit={discoverRepos}>
                 <div className="github-input"><Github size={19} /><span>github.com/</span><input value={username} onChange={(event) => setUsername(event.target.value)} placeholder="your-username" aria-label="GitHub username" /></div>
-                <button className="button button-primary" type="submit" disabled={busy || !username.trim()}>{busy ? <LoaderCircle size={17} className="spin" /> : <>Build your startup city <ArrowRight size={17} /></>}</button>
+                <button className="button button-primary" type="submit" disabled={busy || !username.trim()}>{busy ? <LoaderCircle size={17} className="spin" /> : <>Raise your kingdom <ArrowRight size={17} /></>}</button>
               </form>
               {error && <p className="inline-error">{error}</p>}
               <div className="hero-proof"><span><ShieldCheck size={14} /> Public repositories</span><span><LockKeyhole size={14} /> Read-only discovery</span><span><Zap size={14} /> No setup required</span></div>
@@ -473,15 +473,15 @@ export default function InceptownApp() {
           <section className="intro-section" id="how-it-works">
             <div className="section-kicker">A DIFFERENT WAY TO SEE YOUR WORK</div>
             <h2>From repository to <span>reality.</span></h2>
-            <p className="section-lede">Your codebase has a story. Inceptown gives it a place to live — and gives every project room to grow.</p>
+            <p className="section-lede">Your codebase is a kingdom in motion. Clash of Codex gives every project a district, every file a place, and every mission a clear command.</p>
             <div className="feature-grid">
-              <article className="feature-card"><span className="feature-number">01</span><div className="feature-icon mint"><Github size={21} /></div><h3>Connect your world</h3><p>Enter a GitHub username. Inceptown discovers public repositories and maps their structure into a visual city.</p><span className="feature-foot">REPOSITORY → CITY</span></article>
+              <article className="feature-card"><span className="feature-number">01</span><div className="feature-icon mint"><Github size={21} /></div><h3>Connect your realm</h3><p>Enter a GitHub username. Clash of Codex discovers public repositories and maps their real structure into a visual city.</p><span className="feature-foot">REPOSITORY → KINGDOM</span></article>
               <article className="feature-card"><span className="feature-number">02</span><div className="feature-icon violet"><Layers3 size={21} /></div><h3>Give projects a home</h3><p>Project roots become companies. Files find their floors. Shared code stays visible without moving a single file.</p><span className="feature-foot">PROJECT → COMPANY</span></article>
               <article className="feature-card"><span className="feature-number">03</span><div className="feature-icon amber"><Bot size={21} /></div><h3>Grow your crew</h3><p>Make room for specialist AI employees — from product planning and architecture to engineering and QA.</p><span className="feature-foot">AGENTS → MISSIONS</span></article>
             </div>
           </section>
           <section className="closing-cta"><div className="closing-orb" /><div><span className="section-kicker">YOUR NEXT CHAPTER STARTS HERE</span><h2>Make room for<br /><em>what&apos;s possible.</em></h2></div><form onSubmit={discoverRepos} className="closing-form"><div className="github-input"><Github size={17} /><input value={username} onChange={(event) => setUsername(event.target.value)} placeholder="GitHub username" aria-label="GitHub username" /></div><button className="button button-primary" disabled={busy || !username.trim()}>Build your city <ArrowRight size={16} /></button></form></section>
-          <footer className="footer"><Brand onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} /><span>Ideas deserve a world of their own.</span><small>© 2026 Inceptown · Built for the builders.</small></footer>
+          <footer className="footer"><Brand onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} /><span>A city. A development environment. An AI engineering kingdom.</span><small>© 2026 Clash of Codex · Built for builders.</small></footer>
         </>
       )}
 
@@ -491,7 +491,7 @@ export default function InceptownApp() {
           <div className="page-heading"><div><span className="section-kicker">GITHUB EXPLORER</span><h1>Choose a world<br /><em>to bring to life.</em></h1><p>We found these public repositories for <strong>@{repoOwner}</strong>. Each repository becomes its own city.</p></div><div className="repo-count"><strong>{repos.length.toString().padStart(2, "0")}</strong><span>PUBLIC REPOSITORIES</span></div></div>
           {error && <p className="inline-error">{error}</p>}
           <div className="repo-grid">{repos.map((repo) => <RepoCard key={repo.id} repo={repo} onBuild={() => buildCity(repo)} />)}</div>
-          <div className="privacy-note"><ShieldCheck size={16} /> Inceptown only reads public repository metadata and file trees. It never changes your code.</div>
+          <div className="privacy-note"><ShieldCheck size={16} /> Clash of Codex only reads public repository metadata and file trees. It never changes your code.</div>
         </section>
       )}
 
@@ -517,7 +517,7 @@ export default function InceptownApp() {
               <button onClick={() => setTerminalOpen(true)}><TerminalSquare size={15} /> Console</button>
             </nav>
             <div className="workspace-scroll">
-              <div className="city-heading"><div><span className="section-kicker">YOUR STARTUP CITY</span>{editingCity ? <form className="rename-form" onSubmit={(e) => { e.preventDefault(); setEditingCity(false); }}><input value={cityName} onChange={(e) => setCityName(e.target.value)} autoFocus /><button className="mini-save"><Check size={14} /></button></form> : <h1>{cityName}</h1>}<p>A living map of <strong>{selectedRepo.full_name}</strong>. Explore a company to see what&apos;s inside.</p></div><button className="button button-outline small" onClick={() => { setError(""); setCompanyModal(true); }}><Plus size={15} /> New company</button></div>
+              <div className="city-heading"><div><span className="section-kicker">YOUR ENGINEERING KINGDOM</span>{editingCity ? <form className="rename-form" onSubmit={(e) => { e.preventDefault(); setEditingCity(false); }}><input value={cityName} onChange={(e) => setCityName(e.target.value)} autoFocus /><button className="mini-save"><Check size={14} /></button></form> : <h1>{cityName}</h1>}<p>A living map of <strong>{selectedRepo.full_name}</strong>. Explore a company to see what&apos;s inside.</p></div><button className="button button-outline small" onClick={() => { setError(""); setCompanyModal(true); }}><Plus size={15} /> New company</button></div>
               <div className="city-stats"><Stat icon={Layers3} label="companies" value={projects.length} /><Stat icon={FileCode2} label="files mapped" value={formatNumber(allFiles.filter((f) => f.type === "blob").length)} /><Stat icon={GitBranch} label="commits" value={commitCount ? formatNumber(commitCount) : "—"} /><Stat icon={Code2} label="languages" value={allLanguages.length || "—"} /></div>
               {tab === "overview" && <>
                 <div className="city-board">
@@ -549,7 +549,7 @@ export default function InceptownApp() {
               </>}
               {tab === "companies" && <section className="tab-content"><div className="panel-heading"><div><span className="section-kicker">PROJECT ORGANIZATION</span><h2>Your companies</h2><p>These groupings are mapped from repository structure. Nothing has been moved or rewritten.</p></div><button className="button button-primary small" onClick={() => setCompanyModal(true)}><Plus size={15} /> Create company</button></div><div className="company-grid">{projects.map((project) => <button key={project.id} className={`company-card ${project.id === selectedProject?.id ? "selected" : ""}`} onClick={() => { setSelectedProjectId(project.id); setSelectedFilePath(""); setFloorOpen(0); }}><div className="company-card-building" style={{ "--building-color": project.color } as React.CSSProperties}><div className="tower-windows" /></div><span className="company-card-meta"><span>{project.language}</span><span>{project.files.length} files</span></span><h3>{project.name}</h3><p>{project.root}</p><span className="company-card-link">Inspect company <ArrowUpRight size={14} /></span></button>)}</div><section className="panel file-inspector"><div className="panel-heading"><div><span className="section-kicker">COMPANY BLUEPRINT</span><h3>{selectedProject?.name || "Select a company"}</h3><p>{selectedProject?.root}</p></div><span className="quiet-pill">{selectedProject?.files.length || 0} FILES</span></div>{floors.map((floor, index) => <FloorRow key={floor.name} floor={floor} repoFullName={selectedRepo.full_name} branch={selectedRepo.default_branch} active={floorOpen === index} selectedFilePath={selectedFilePath} onClick={() => setFloorOpen(floorOpen === index ? -1 : index)} />)}</section><CrewBlueprint projectName={selectedProject?.name || "this company"} onConfigure={() => setSettingsOpen(true)} /></section>}
               {tab === "missions" && <section className="tab-content"><div className="panel-heading"><div><span className="section-kicker">WORK IN MOTION</span><h2>Mission control</h2><p>Capture what you want your future crew to work on.</p></div></div><section className="prompt-panel"><form className="mission-form" onSubmit={createMission}><textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Describe the next feature, improvement or product idea…" rows={3} /><div className="mission-form-bottom"><span>Saved locally as a draft</span><button className="button button-primary small" disabled={!prompt.trim()}><Plus size={14} /> Add mission</button></div></form></section>{missions.length ? <div className="mission-list">{missions.map((mission) => <article className="mission-card" key={mission.id}><span className="mission-icon"><Rocket size={17} /></span><div><span className="quiet-pill">{mission.status}</span><h3>{mission.prompt}</h3><p>{mission.projectName} · {new Date(mission.createdAt).toLocaleString()}</p></div><ArrowUpRight size={16} /></article>)}</div> : <div className="empty-state"><div className="empty-icon"><Rocket size={22} /></div><h3>Your first mission is waiting.</h3><p>Capture an idea above and start shaping what your crew will build.</p></div>}</section>}
-              <footer className="workspace-footer"><span>INCEPTOWN EARLY ACCESS · CITY ENGINE 0.1</span><span><ShieldCheck size={13} /> Read-only GitHub connection</span></footer>
+              <footer className="workspace-footer"><span>CLASH OF CODEX · KINGDOM ENGINE 1.0</span><span><ShieldCheck size={13} /> Read-only GitHub connection</span></footer>
             </div>
           </section>
           <aside className="right-rail">
@@ -566,11 +566,11 @@ export default function InceptownApp() {
       )}
 
       <AnimatePresence>
-        {settingsOpen && <motion.div className="modal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(e) => { if (e.target === e.currentTarget) setSettingsOpen(false); }}><motion.div className="settings-modal" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}><div className="modal-header"><div><span className="section-kicker">PREFERENCES & CONNECTIONS</span><h2>City settings</h2></div><button className="icon-button" onClick={() => setSettingsOpen(false)}><X size={17} /></button></div><div className="settings-section"><h3><Cpu size={16} /> AI provider preferences</h3><p>Choose the provider you plan to use with your future Inceptown agent runtime.</p><label className="field-label">PROVIDER</label><select value={provider} onChange={(e) => { const next = e.target.value; setProvider(next); setModel(next === "OpenAI" ? "GPT-4.1" : next === "Anthropic Claude" ? "Claude Sonnet" : next === "Google Gemini" ? "Gemini 2.5 Pro" : "Provider default"); }}><option>OpenAI</option><option>Anthropic Claude</option><option>Google Gemini</option><option>OpenRouter</option><option>Custom / compatible API</option></select><label className="field-label">PREFERRED MODEL</label><select value={model} onChange={(e) => setModel(e.target.value)}>{(provider === "OpenAI" ? ["GPT-4.1", "GPT-4.1 mini", "o3", "o4-mini"] : provider === "Anthropic Claude" ? ["Claude Sonnet", "Claude Opus", "Claude Haiku"] : provider === "Google Gemini" ? ["Gemini 2.5 Pro", "Gemini 2.5 Flash"] : ["Provider default", "Custom model"]).map((item) => <option key={item}>{item}</option>)}</select><div className="connection-status"><span className="status-indicator" /><div><strong>Secure connection not configured</strong><small>Provider preference: {provider} · {model}</small></div><span className="quiet-pill">PLANNED</span></div><div className="security-callout"><LockKeyhole size={17} /><p>API keys and subscription sign-in must be handled by a secure server-side connection. This browser-only foundation never asks for or stores your provider secrets. ChatGPT and Claude subscription access is only possible where each provider officially supports it.</p></div></div><div className="settings-section"><h3><Github size={16} /> GitHub connection</h3><div className="connection-status"><span className="status-indicator active" /><div><strong>Public repository access</strong><small>Connected through GitHub&apos;s public API</small></div><span className="quiet-pill">ACTIVE</span></div><p className="settings-hint">Private repositories and write access will require a GitHub App installation with granular permissions.</p></div><div className="modal-footer"><span>Settings are session-only in this foundation.</span><button className="button button-primary small" onClick={() => setSettingsOpen(false)}>Done <Check size={14} /></button></div></motion.div></motion.div>}
+        {settingsOpen && <motion.div className="modal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(e) => { if (e.target === e.currentTarget) setSettingsOpen(false); }}><motion.div className="settings-modal" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 20, opacity: 0 }}><div className="modal-header"><div><span className="section-kicker">PREFERENCES & CONNECTIONS</span><h2>City settings</h2></div><button className="icon-button" onClick={() => setSettingsOpen(false)}><X size={17} /></button></div><div className="settings-section"><h3><Cpu size={16} /> AI provider preferences</h3><p>Choose the provider you plan to use with your future Clash of Codex agent runtime.</p><label className="field-label">PROVIDER</label><select value={provider} onChange={(e) => { const next = e.target.value; setProvider(next); setModel(next === "OpenAI" ? "GPT-4.1" : next === "Anthropic Claude" ? "Claude Sonnet" : next === "Google Gemini" ? "Gemini 2.5 Pro" : "Provider default"); }}><option>OpenAI</option><option>Anthropic Claude</option><option>Google Gemini</option><option>OpenRouter</option><option>Custom / compatible API</option></select><label className="field-label">PREFERRED MODEL</label><select value={model} onChange={(e) => setModel(e.target.value)}>{(provider === "OpenAI" ? ["GPT-4.1", "GPT-4.1 mini", "o3", "o4-mini"] : provider === "Anthropic Claude" ? ["Claude Sonnet", "Claude Opus", "Claude Haiku"] : provider === "Google Gemini" ? ["Gemini 2.5 Pro", "Gemini 2.5 Flash"] : ["Provider default", "Custom model"]).map((item) => <option key={item}>{item}</option>)}</select><div className="connection-status"><span className="status-indicator" /><div><strong>Secure connection not configured</strong><small>Provider preference: {provider} · {model}</small></div><span className="quiet-pill">PLANNED</span></div><div className="security-callout"><LockKeyhole size={17} /><p>API keys and subscription sign-in must be handled by a secure server-side connection. This browser-only foundation never asks for or stores your provider secrets. ChatGPT and Claude subscription access is only possible where each provider officially supports it.</p></div></div><div className="settings-section"><h3><Github size={16} /> GitHub connection</h3><div className="connection-status"><span className="status-indicator active" /><div><strong>Public repository access</strong><small>Connected through GitHub&apos;s public API</small></div><span className="quiet-pill">ACTIVE</span></div><p className="settings-hint">Private repositories and write access will require a GitHub App installation with granular permissions.</p></div><div className="modal-footer"><span>Settings are session-only in this foundation.</span><button className="button button-primary small" onClick={() => setSettingsOpen(false)}>Done <Check size={14} /></button></div></motion.div></motion.div>}
       </AnimatePresence>
 
       <AnimatePresence>
-        {terminalOpen && <motion.div className="terminal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(e) => { if (e.target === e.currentTarget) setTerminalOpen(false); }}><motion.div className="terminal-window" initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 24, opacity: 0 }}><div className="terminal-titlebar"><div className="terminal-dots"><i /><i /><i /></div><span><TerminalSquare size={14} /> INCEPTOWN INSPECTOR</span><button onClick={() => setTerminalOpen(false)}><X size={16} /></button></div><div className="terminal-meta"><span>READ-ONLY REPOSITORY CONSOLE</span><span>{selectedRepo?.full_name}</span></div><div className="terminal-output">{terminalLines.map((line, i) => <div key={i} className={line.startsWith("inceptown $") ? "terminal-command" : ""}>{line || " "}</div>)}</div><form className="terminal-form" onSubmit={runConsole}><span>inceptown $</span><input value={terminalInput} onChange={(e) => setTerminalInput(e.target.value)} placeholder={terminalBusy ? "Reading repository…" : "Type a command…"} autoFocus disabled={terminalBusy} /><button type="submit" disabled={terminalBusy}><ArrowUpRight size={16} /></button></form><div className="terminal-foot">Read-only GitHub inspector · try <code>help</code>, <code>ls</code>, <code>find</code>, <code>cat README.md</code> · no shell execution or repository writes.</div></motion.div></motion.div>}
+        {terminalOpen && <motion.div className="terminal-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(e) => { if (e.target === e.currentTarget) setTerminalOpen(false); }}><motion.div className="terminal-window" initial={{ y: 24, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 24, opacity: 0 }}><div className="terminal-titlebar"><div className="terminal-dots"><i /><i /><i /></div><span><TerminalSquare size={14} /> CLASH OF CODEX INSPECTOR</span><button onClick={() => setTerminalOpen(false)}><X size={16} /></button></div><div className="terminal-meta"><span>READ-ONLY REPOSITORY CONSOLE</span><span>{selectedRepo?.full_name}</span></div><div className="terminal-output">{terminalLines.map((line, i) => <div key={i} className={line.startsWith("codex@kingdom $") ? "terminal-command" : ""}>{line || " "}</div>)}</div><form className="terminal-form" onSubmit={runConsole}><span>codex@kingdom $</span><input value={terminalInput} onChange={(e) => setTerminalInput(e.target.value)} placeholder={terminalBusy ? "Reading repository…" : "Type a command…"} autoFocus disabled={terminalBusy} /><button type="submit" disabled={terminalBusy}><ArrowUpRight size={16} /></button></form><div className="terminal-foot">Read-only GitHub inspector · try <code>help</code>, <code>ls</code>, <code>find</code>, <code>cat README.md</code> · no shell execution or repository writes.</div></motion.div></motion.div>}
       </AnimatePresence>
 
       <AnimatePresence>
