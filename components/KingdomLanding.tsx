@@ -8,18 +8,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import styles from "./KingdomLanding.module.css";
-import type { Project } from "@/types/inceptown";
 
 const KingdomScene = dynamic(() => import("@/components/KingdomScene"), {
   ssr: false,
   loading: () => <div className={styles.sceneLoading}>Raising the kingdom…</div>,
 });
-
-const demoProjects: Project[] = [
-  { id: "demo-product", name: "Builder Workshop", root: "apps/product", files: Array.from({ length: 12 }, (_, i) => ({ path: `apps/product/src/module-${i}.tsx`, type: "blob" as const, sha: String(i) })), language: "TypeScript", commits: 128, stars: 24, color: "#F0B83D" },
-  { id: "demo-api", name: "AI Research Lab", root: "services/ai", files: Array.from({ length: 8 }, (_, i) => ({ path: `services/ai/module-${i}.py`, type: "blob" as const, sha: String(i) })), language: "Python", commits: 76, stars: 12, color: "#B77BE8" },
-  { id: "demo-quality", name: "Testing Tower", root: "packages/tests", files: Array.from({ length: 6 }, (_, i) => ({ path: `packages/tests/test-${i}.ts`, type: "blob" as const, sha: String(i) })), language: "TypeScript", commits: 43, stars: 8, color: "#69A9D8" },
-];
 
 const builders = [
   { initials: "AR", name: "Architect", task: "Planning systems", color: "purple" },
