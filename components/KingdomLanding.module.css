@@ -749,6 +749,217 @@
     top: 56%;
   }
 }
+
+/* Final command-center skin: one visual language across auth, repository atlas, and city. */
+.cityShell {
+  --panel: rgba(5, 17, 28, 0.92);
+  --panel-2: #0d2636;
+  --line: rgba(126, 190, 211, 0.3);
+  --text: #edf7fa;
+  --muted: #8ca9b6;
+  --amber: #ffbd32;
+  --cyan: #69d8f3;
+  --green: #48dda0;
+  background: #06131d;
+  color: var(--text);
+}
+.panel,
+.cityBrand {
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: linear-gradient(
+    145deg,
+    rgba(7, 24, 36, 0.96),
+    rgba(5, 16, 26, 0.9)
+  );
+  color: var(--text);
+  box-shadow: 0 18px 48px rgba(0, 7, 13, 0.3);
+  backdrop-filter: blur(14px);
+}
+.panel:before,
+.panel:after {
+  display: block;
+}
+.title {
+  border-bottom: 1px solid var(--line);
+  color: var(--amber);
+}
+.title > span,
+.big,
+.cityBrand strong,
+.searchModal input {
+  color: var(--text);
+}
+.title > b {
+  color: #ff6575;
+}
+.good {
+  color: var(--green) !important;
+}
+.metrics div,
+.orderMeta div,
+.inspector dl div {
+  border: 1px solid rgba(105, 216, 243, 0.15);
+  border-radius: 2px;
+  background: rgba(16, 46, 62, 0.72);
+}
+.scan {
+  width: 252px;
+}
+.mayor {
+  width: 302px;
+}
+.order {
+  width: 318px;
+}
+.cityBrand {
+  top: 14px;
+  padding: 7px;
+  border-color: rgba(105, 216, 243, 0.45);
+}
+.cityBrand > span {
+  border: 1px solid rgba(255, 189, 50, 0.65);
+  border-radius: 2px;
+  background: var(--amber);
+  color: #07131c;
+  box-shadow: none;
+}
+.cityBrand small {
+  color: var(--muted);
+}
+.cityBrand button,
+.dispatch,
+.policy .active {
+  border: 1px solid #ffd16b;
+  border-radius: 2px;
+  background: var(--amber);
+  color: #09151e;
+  box-shadow: none;
+}
+.agent {
+  border-top: 1px solid var(--line);
+}
+.agent > span {
+  border: 1px solid #8b6cf1;
+  border-radius: 2px;
+  background: rgba(108, 75, 183, 0.3);
+  color: #d9caff;
+}
+.permit {
+  border: 1px dashed var(--line);
+  border-radius: 2px;
+  color: var(--muted);
+}
+.changes {
+  border-top-color: var(--line);
+}
+.order textarea {
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: #04131d;
+  color: var(--text);
+}
+.policy button {
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--muted);
+}
+.searchModal {
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: #071925;
+  color: var(--text);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+}
+
+.gate,
+.realm {
+  --gate-ink: #edf7fa;
+  --gate-panel: rgba(7, 25, 37, 0.94);
+  --gate-line: rgba(105, 216, 243, 0.3);
+  --gate-amber: #ffbd32;
+  --gate-cream: #edf7fa;
+  --gate-mint: #48dda0;
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      rgba(35, 110, 137, 0.25),
+      transparent 36%
+    ),
+    linear-gradient(145deg, #06131d, #020911 75%);
+  color: #edf7fa;
+}
+.gate:before,
+.realm:before {
+  background-image:
+    linear-gradient(rgba(105, 216, 243, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(105, 216, 243, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.gateGrid {
+  border-color: rgba(105, 216, 243, 0.16);
+  background: none;
+}
+.gateCard,
+.gateStatus,
+.realmBar,
+.realmIntro,
+.realmTile {
+  border: 1px solid rgba(105, 216, 243, 0.28);
+  border-radius: 3px;
+  background: rgba(7, 24, 36, 0.93);
+  color: #edf7fa;
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.34);
+}
+.gateCard h1,
+.gateStatus strong,
+.gateBrand,
+.realmIntro h1,
+.realmBrand strong {
+  color: #edf7fa;
+  text-shadow: none;
+}
+.gateCopy,
+.gateRules span,
+.gateStatus span,
+.gateBrand small,
+.realmIntro p {
+  color: #8ca9b6;
+}
+.gateCrest,
+.gateEnter,
+.gateLoading {
+  border: 1px solid #ffd16b;
+  border-radius: 2px;
+  background: #ffbd32;
+  color: #07131c;
+  box-shadow: none;
+}
+.gateSignal {
+  color: #69d8f3;
+}
+.realmTile:hover {
+  border-color: #ffbd32;
+  transform: translateY(-3px);
+  box-shadow:
+    0 20px 54px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(255, 189, 50, 0.15);
+}
+
+@media (max-width: 900px) {
+  .panel {
+    border-width: 1px;
+  }
+  .scan {
+    width: 220px;
+  }
+  .mayor {
+    width: 244px;
+  }
+  .order {
+    width: 276px;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .cityShell * {
     animation-duration: 0.01ms !important;
@@ -1187,12 +1398,736 @@
   }
 }
 
-.realm{--wood:#6f3d22;--gold:#ffc137;--grass:#74bd4b;min-height:100svh;padding:88px clamp(18px,5vw,76px) 60px;overflow-x:hidden;background:linear-gradient(#73cff0 0 28%,#8dd25a 28% 100%);color:#3c281b;font-family:Inter,Arial,sans-serif}.realm:before{content:"";position:fixed;inset:28% 0 0;pointer-events:none;background:linear-gradient(135deg,transparent 0 24%,rgba(255,255,255,.15) 24% 25%,transparent 25% 62%,rgba(255,255,255,.13) 62% 63%,transparent 63%),repeating-linear-gradient(45deg,rgba(75,134,44,.12) 0 1px,transparent 1px 42px)}.realmSky{position:fixed;inset:0;pointer-events:none;overflow:hidden}.realmSky i{position:absolute;width:170px;height:50px;border-radius:60px;background:rgba(255,255,255,.72);box-shadow:55px -18px 0 5px rgba(255,255,255,.72),105px 3px 0 -8px rgba(255,255,255,.72)}.realmSky i:nth-child(1){top:13%;left:8%}.realmSky i:nth-child(2){top:18%;right:10%;transform:scale(.7)}.realmSky i:nth-child(3){top:42%;left:-5%;transform:scale(.55)}
-.realmBar{position:fixed;z-index:10;left:0;right:0;top:0;height:64px;display:flex;align-items:center;gap:18px;padding:0 22px;border-bottom:5px solid #4d2b1c;background:linear-gradient(#80502f,#57321f);box-shadow:0 5px 12px rgba(67,40,20,.28);color:white}.realmBrand{display:flex;align-items:center;gap:9px}.realmBrand>span{width:38px;height:38px;display:grid;place-items:center;border:3px solid #ffe07a;border-radius:9px;background:#e28a21;box-shadow:inset 0 -5px 0 #b65b18}.realmBrand svg{width:19px}.realmBrand strong{font-weight:950;font-size:19px;letter-spacing:-.7px;text-shadow:0 2px 0 #2d1b13}.realmResources{margin-left:auto;display:flex;gap:9px}.realmResources span{height:34px;display:flex;align-items:center;gap:5px;padding:0 10px;border:2px solid #3f271b;border-radius:8px;background:#2b211c;font-weight:900;font-size:11px}.realmResources svg{width:14px;color:#ffd64b}.realmResources .realmGold{background:#844c23;color:#ffe281}.realmMayor{display:flex;align-items:center;gap:7px;padding-left:15px;border-left:2px solid rgba(255,255,255,.22)}.realmMayor img{width:34px;height:34px;border:2px solid #ffe281;border-radius:7px}.realmMayor strong,.realmMayor small{display:block}.realmMayor strong{font-size:11px}.realmMayor small{font-size:8px;color:#e5c8a8}.realmMayor button{margin-left:6px;border:0;border-radius:6px;padding:7px;background:#bd4b3d;color:white;font-weight:900;font-size:8px}
-.realmIntro{position:relative;z-index:1;max-width:760px;margin:30px auto 26px;text-align:center}.realmIntro>span{display:inline-block;padding:6px 10px;border:3px solid #624124;border-radius:7px;background:#f5d578;color:#5b321d;font-weight:950;font-size:9px;box-shadow:0 4px 0 #9f6a30}.realmIntro h1{margin:17px 0 7px;color:white;font-size:clamp(36px,6vw,64px);line-height:.95;font-weight:1000;letter-spacing:-3px;text-shadow:0 4px 0 #426b2c,0 7px 10px rgba(45,82,26,.28)}.realmIntro p{max-width:620px;margin:14px auto;color:#315027;font-weight:750;font-size:13px;line-height:1.5}.realmIntro label{height:46px;max-width:480px;margin:20px auto 0;display:flex;align-items:center;gap:8px;padding:0 14px;border:4px solid #634022;border-radius:12px;background:#fff7df;box-shadow:0 6px 0 #a66d32}.realmIntro label svg{width:18px;color:#765538}.realmIntro input{width:100%;border:0;outline:0;background:none;color:#3f2a1d;font-weight:800}
-.realmGrid{position:relative;z-index:1;max-width:1180px;margin:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:18px}.realmTile{min-height:230px;display:flex;flex-direction:column;align-items:stretch;padding:0;border:4px solid #5a351f;border-radius:14px;background:#fff4cf;box-shadow:0 8px 0 #8b572c,0 13px 20px rgba(69,73,35,.2);overflow:hidden;text-align:left;color:#452b1b;cursor:pointer;transition:transform .16s,filter .16s}.realmTile:hover{transform:translateY(-5px);filter:brightness(1.04)}.realmTile:active{transform:translateY(3px);box-shadow:0 3px 0 #8b572c}.realmTower{height:82px;position:relative;display:block;background:linear-gradient(#74c9e7 0 44%,var(--realm-accent) 44% 100%)}.realmTower:before{content:"";position:absolute;left:50%;bottom:8px;width:62px;height:48px;transform:translateX(-50%);border:4px solid #633d25;border-radius:7px 7px 3px 3px;background:#e7d3a1;box-shadow:inset 0 -9px #c69d62}.realmTower:after{content:"";position:absolute;left:50%;bottom:52px;width:72px;height:23px;transform:translateX(-50%);clip-path:polygon(50% 0,100% 100%,0 100%);background:#9c4e32;filter:drop-shadow(0 3px 0 #633d25)}.realmTower i{position:absolute;z-index:2;bottom:17px;width:7px;height:11px;background:#61371f}.realmTower i:nth-child(1){left:calc(50% - 22px)}.realmTower i:nth-child(2){left:calc(50% - 3px);height:17px}.realmTower i:nth-child(3){left:calc(50% + 15px)}
-.realmInfo{flex:1;display:flex;flex-direction:column;padding:15px}.realmMeta{display:flex;align-items:center;gap:5px;color:#806447;font-size:8px;font-weight:950}.realmMeta svg{width:12px}.realmInfo>strong{margin-top:7px;font-size:19px;font-weight:1000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.realmInfo>small{height:32px;margin-top:5px;color:#806f59;font-size:10px;line-height:1.45;overflow:hidden}.realmStats{display:flex;gap:6px;margin-top:auto;padding-top:12px}.realmStats b{display:flex;align-items:center;gap:3px;padding:5px 7px;border:2px solid #d9bd83;border-radius:6px;background:#f4dfae;font-size:8px}.realmStats svg{width:10px}.realmEnter{padding:10px;text-align:center;border-top:3px solid #5a351f;background:var(--realm-accent);color:white;font-weight:1000;font-size:10px;text-shadow:0 1px 0 rgba(0,0,0,.35)}
-.realmBuild{position:fixed;z-index:50;inset:0;display:grid;place-items:center;background:rgba(36,52,25,.72);backdrop-filter:blur(5px)}.realmBuild>div{min-width:300px;padding:30px;border:5px solid #603a22;border-radius:15px;background:#fff2c9;box-shadow:0 10px 0 #8b572c;text-align:center}.realmBuild svg{width:42px;color:#d98722;animation:spin 1s linear infinite}.realmBuild strong,.realmBuild small{display:block}.realmBuild strong{margin-top:10px;font-size:22px}.realmBuild small{margin-top:7px;color:#7c684e}.realmError,.realmEmpty{position:relative;z-index:2;max-width:620px;margin:15px auto;padding:13px;border:3px solid #7b352a;border-radius:8px;background:#ffd8bf;color:#7b352a;text-align:center;font-weight:800}.realmEmpty{display:grid;place-items:center;gap:10px;border-color:#6b472b;background:#fff0c8}.realmEmpty svg{width:36px}.realmEmpty button{border:0;border-radius:7px;padding:9px 13px;background:#e49423;color:white;font-weight:900}@media(max-width:760px){.realm{padding:82px 12px 40px}.realmResources{display:none}.realmBar{padding:0 10px}.realmMayor{margin-left:auto}.realmMayor span{display:none}.realmIntro{margin-top:15px}.realmGrid{grid-template-columns:1fr 1fr;gap:10px}.realmTile{min-height:210px}.realmInfo>small{display:none}}@media(max-width:480px){.realmGrid{grid-template-columns:1fr}.realmMayor form{display:none}}
+.realm {
+  --wood: #6f3d22;
+  --gold: #ffc137;
+  --grass: #74bd4b;
+  min-height: 100svh;
+  padding: 88px clamp(18px, 5vw, 76px) 60px;
+  overflow-x: hidden;
+  background: linear-gradient(#73cff0 0 28%, #8dd25a 28% 100%);
+  color: #3c281b;
+  font-family: Inter, Arial, sans-serif;
+}
+.realm:before {
+  content: "";
+  position: fixed;
+  inset: 28% 0 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      135deg,
+      transparent 0 24%,
+      rgba(255, 255, 255, 0.15) 24% 25%,
+      transparent 25% 62%,
+      rgba(255, 255, 255, 0.13) 62% 63%,
+      transparent 63%
+    ),
+    repeating-linear-gradient(
+      45deg,
+      rgba(75, 134, 44, 0.12) 0 1px,
+      transparent 1px 42px
+    );
+}
+.realmSky {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.realmSky i {
+  position: absolute;
+  width: 170px;
+  height: 50px;
+  border-radius: 60px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow:
+    55px -18px 0 5px rgba(255, 255, 255, 0.72),
+    105px 3px 0 -8px rgba(255, 255, 255, 0.72);
+}
+.realmSky i:nth-child(1) {
+  top: 13%;
+  left: 8%;
+}
+.realmSky i:nth-child(2) {
+  top: 18%;
+  right: 10%;
+  transform: scale(0.7);
+}
+.realmSky i:nth-child(3) {
+  top: 42%;
+  left: -5%;
+  transform: scale(0.55);
+}
+.realmBar {
+  position: fixed;
+  z-index: 10;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 22px;
+  border-bottom: 5px solid #4d2b1c;
+  background: linear-gradient(#80502f, #57321f);
+  box-shadow: 0 5px 12px rgba(67, 40, 20, 0.28);
+  color: white;
+}
+.realmBrand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.realmBrand > span {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 3px solid #ffe07a;
+  border-radius: 9px;
+  background: #e28a21;
+  box-shadow: inset 0 -5px 0 #b65b18;
+}
+.realmBrand svg {
+  width: 19px;
+}
+.realmBrand strong {
+  font-weight: 950;
+  font-size: 19px;
+  letter-spacing: -0.7px;
+  text-shadow: 0 2px 0 #2d1b13;
+}
+.realmResources {
+  margin-left: auto;
+  display: flex;
+  gap: 9px;
+}
+.realmResources span {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  border: 2px solid #3f271b;
+  border-radius: 8px;
+  background: #2b211c;
+  font-weight: 900;
+  font-size: 11px;
+}
+.realmResources svg {
+  width: 14px;
+  color: #ffd64b;
+}
+.realmResources .realmGold {
+  background: #844c23;
+  color: #ffe281;
+}
+.realmMayor {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding-left: 15px;
+  border-left: 2px solid rgba(255, 255, 255, 0.22);
+}
+.realmMayor img {
+  width: 34px;
+  height: 34px;
+  border: 2px solid #ffe281;
+  border-radius: 7px;
+}
+.realmMayor strong,
+.realmMayor small {
+  display: block;
+}
+.realmMayor strong {
+  font-size: 11px;
+}
+.realmMayor small {
+  font-size: 8px;
+  color: #e5c8a8;
+}
+.realmMayor button {
+  margin-left: 6px;
+  border: 0;
+  border-radius: 6px;
+  padding: 7px;
+  background: #bd4b3d;
+  color: white;
+  font-weight: 900;
+  font-size: 8px;
+}
+.realmIntro {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  margin: 30px auto 26px;
+  text-align: center;
+}
+.realmIntro > span {
+  display: inline-block;
+  padding: 6px 10px;
+  border: 3px solid #624124;
+  border-radius: 7px;
+  background: #f5d578;
+  color: #5b321d;
+  font-weight: 950;
+  font-size: 9px;
+  box-shadow: 0 4px 0 #9f6a30;
+}
+.realmIntro h1 {
+  margin: 17px 0 7px;
+  color: white;
+  font-size: clamp(36px, 6vw, 64px);
+  line-height: 0.95;
+  font-weight: 1000;
+  letter-spacing: -3px;
+  text-shadow:
+    0 4px 0 #426b2c,
+    0 7px 10px rgba(45, 82, 26, 0.28);
+}
+.realmIntro p {
+  max-width: 620px;
+  margin: 14px auto;
+  color: #315027;
+  font-weight: 750;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.realmIntro label {
+  height: 46px;
+  max-width: 480px;
+  margin: 20px auto 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 4px solid #634022;
+  border-radius: 12px;
+  background: #fff7df;
+  box-shadow: 0 6px 0 #a66d32;
+}
+.realmIntro label svg {
+  width: 18px;
+  color: #765538;
+}
+.realmIntro input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: #3f2a1d;
+  font-weight: 800;
+}
+.realmGrid {
+  position: relative;
+  z-index: 1;
+  max-width: 1180px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
+  gap: 18px;
+}
+.realmTile {
+  min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+  border: 4px solid #5a351f;
+  border-radius: 14px;
+  background: #fff4cf;
+  box-shadow:
+    0 8px 0 #8b572c,
+    0 13px 20px rgba(69, 73, 35, 0.2);
+  overflow: hidden;
+  text-align: left;
+  color: #452b1b;
+  cursor: pointer;
+  transition:
+    transform 0.16s,
+    filter 0.16s;
+}
+.realmTile:hover {
+  transform: translateY(-5px);
+  filter: brightness(1.04);
+}
+.realmTile:active {
+  transform: translateY(3px);
+  box-shadow: 0 3px 0 #8b572c;
+}
+.realmTower {
+  height: 82px;
+  position: relative;
+  display: block;
+  background: linear-gradient(#74c9e7 0 44%, var(--realm-accent) 44% 100%);
+}
+.realmTower:before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  width: 62px;
+  height: 48px;
+  transform: translateX(-50%);
+  border: 4px solid #633d25;
+  border-radius: 7px 7px 3px 3px;
+  background: #e7d3a1;
+  box-shadow: inset 0 -9px #c69d62;
+}
+.realmTower:after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 52px;
+  width: 72px;
+  height: 23px;
+  transform: translateX(-50%);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  background: #9c4e32;
+  filter: drop-shadow(0 3px 0 #633d25);
+}
+.realmTower i {
+  position: absolute;
+  z-index: 2;
+  bottom: 17px;
+  width: 7px;
+  height: 11px;
+  background: #61371f;
+}
+.realmTower i:nth-child(1) {
+  left: calc(50% - 22px);
+}
+.realmTower i:nth-child(2) {
+  left: calc(50% - 3px);
+  height: 17px;
+}
+.realmTower i:nth-child(3) {
+  left: calc(50% + 15px);
+}
+.realmInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+}
+.realmMeta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #806447;
+  font-size: 8px;
+  font-weight: 950;
+}
+.realmMeta svg {
+  width: 12px;
+}
+.realmInfo > strong {
+  margin-top: 7px;
+  font-size: 19px;
+  font-weight: 1000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.realmInfo > small {
+  height: 32px;
+  margin-top: 5px;
+  color: #806f59;
+  font-size: 10px;
+  line-height: 1.45;
+  overflow: hidden;
+}
+.realmStats {
+  display: flex;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+.realmStats b {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 7px;
+  border: 2px solid #d9bd83;
+  border-radius: 6px;
+  background: #f4dfae;
+  font-size: 8px;
+}
+.realmStats svg {
+  width: 10px;
+}
+.realmEnter {
+  padding: 10px;
+  text-align: center;
+  border-top: 3px solid #5a351f;
+  background: var(--realm-accent);
+  color: white;
+  font-weight: 1000;
+  font-size: 10px;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+.realmBuild {
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(36, 52, 25, 0.72);
+  backdrop-filter: blur(5px);
+}
+.realmBuild > div {
+  min-width: 300px;
+  padding: 30px;
+  border: 5px solid #603a22;
+  border-radius: 15px;
+  background: #fff2c9;
+  box-shadow: 0 10px 0 #8b572c;
+  text-align: center;
+}
+.realmBuild svg {
+  width: 42px;
+  color: #d98722;
+  animation: spin 1s linear infinite;
+}
+.realmBuild strong,
+.realmBuild small {
+  display: block;
+}
+.realmBuild strong {
+  margin-top: 10px;
+  font-size: 22px;
+}
+.realmBuild small {
+  margin-top: 7px;
+  color: #7c684e;
+}
+.realmError,
+.realmEmpty {
+  position: relative;
+  z-index: 2;
+  max-width: 620px;
+  margin: 15px auto;
+  padding: 13px;
+  border: 3px solid #7b352a;
+  border-radius: 8px;
+  background: #ffd8bf;
+  color: #7b352a;
+  text-align: center;
+  font-weight: 800;
+}
+.realmEmpty {
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  border-color: #6b472b;
+  background: #fff0c8;
+}
+.realmEmpty svg {
+  width: 36px;
+}
+.realmEmpty button {
+  border: 0;
+  border-radius: 7px;
+  padding: 9px 13px;
+  background: #e49423;
+  color: white;
+  font-weight: 900;
+}
+@media (max-width: 760px) {
+  .realm {
+    padding: 82px 12px 40px;
+  }
+  .realmResources {
+    display: none;
+  }
+  .realmBar {
+    padding: 0 10px;
+  }
+  .realmMayor {
+    margin-left: auto;
+  }
+  .realmMayor span {
+    display: none;
+  }
+  .realmIntro {
+    margin-top: 15px;
+  }
+  .realmGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .realmTile {
+    min-height: 210px;
+  }
+  .realmInfo > small {
+    display: none;
+  }
+}
+@media (max-width: 480px) {
+  .realmGrid {
+    grid-template-columns: 1fr;
+  }
+  .realmMayor form {
+    display: none;
+  }
+}
 
 /* Shared village materials: login, atlas, and city now speak one visual language. */
-.cityShell{--navy:#4b2b1b;--panel:rgba(255,241,199,.96);--panel2:#edd39a;--border:#61391f;--text:#43291b;--muted:#7b624d;--amber:#f4b52a;--green:#3f8d3d;background:#83c94f;color:var(--text)}.panel,.cityBrand{border:4px solid var(--border);border-radius:12px;background:var(--panel);box-shadow:0 7px 0 #8f5a2e,0 12px 24px rgba(72,61,33,.2);backdrop-filter:none}.panel:before,.panel:after{display:none}.title{border-bottom:2px solid #d4af70;font-weight:950}.title>span{color:#78471f}.title>b{color:#b33d35}.good{color:#35883b!important}.big{color:#5a321c;font-weight:1000}.metrics div,.orderMeta div,.inspector dl div{border:2px solid #d1ad6d;border-radius:8px;background:#f4ddaa}.cityBrand{top:14px;padding:7px;border-color:#52301e;background:linear-gradient(#77482b,#55311e);color:white}.cityBrand>span{border:3px solid #ffe078;border-radius:8px;background:#e38b20;color:#352113;box-shadow:inset 0 -4px #b85c18}.cityBrand small{color:#e6c8a6}.cityBrand button{border:2px solid #3e271a;border-radius:7px;background:#f0ae28;color:#3d281b;font-weight:950}.cityBrand button:hover{filter:brightness(1.08)}.scan{width:280px}.mayor{width:330px}.order{width:350px}.agent{border-top:2px solid #d4af70}.agent>span{border:2px solid #673f79;border-radius:7px;background:#8c63ad;color:white}.permit{border:2px dashed #bd9560;border-radius:8px;color:#725b47}.changes{border-top-color:#d4af70}.dispatch{border:3px solid #70471f;border-radius:8px;background:#d8b36d;color:#73552c}.order textarea{border:3px solid #764727;border-radius:8px;background:#fff8df;color:#42291b}.policy button{border:2px solid #aa814c;border-radius:7px;color:#765d42}.policy .active{border-color:#84521e;background:#f4bd39;color:#4b2c18}.searchModal{border:5px solid #603921;border-radius:14px;background:#fff1c7;color:#43291b}.searchModal>div,.searchModal>button{border-bottom-color:#d5b274}.searchModal input{color:#43291b}.gate{--gate-ink:#3b281d;--gate-panel:#fff1c7;--gate-line:#6a4025;--gate-amber:#f4b52a;--gate-cream:#fff6d7;--gate-mint:#4b9a45;background:linear-gradient(#72cff0 0 46%,#83c94f 46% 100%);color:#43291b}.gate:before{background:repeating-linear-gradient(45deg,rgba(67,119,45,.1) 0 1px,transparent 1px 46px)}.gateGrid{border-color:rgba(85,52,29,.25);background:repeating-linear-gradient(90deg,transparent 0 79px,rgba(85,52,29,.12) 80px),repeating-linear-gradient(0deg,transparent 0 79px,rgba(85,52,29,.12) 80px)}.gateCard{border:5px solid #603921;border-radius:15px;background:#fff1c7;box-shadow:0 10px 0 #936033,0 24px 60px rgba(70,64,36,.28)}.gateCard h1{color:#4a2d1d;text-shadow:0 2px #fff}.gateCopy{color:#745d48}.gateCrest{border:4px solid #603921;border-radius:10px;background:#e58c22;color:white;box-shadow:inset 0 -6px #b85d19}.gateSignal{color:#8a511e;font-weight:950}.gateEnter,.gateLoading{border:4px solid #65401f;border-radius:9px;background:#f4b52a;color:#3c281b;box-shadow:0 5px 0 #9b622d}.gateRules span{color:#6f5a46;font-weight:800}.gateStatus{border:4px solid #603921;border-radius:10px;background:#fff1c7}.gateStatus strong{color:#4a2d1d}.gateStatus span{color:#745d48}.gateBrand{color:#43291b}.gateBrand small{color:#5c6548}.gateBrand>b{border-color:#694127;color:#5d3c26;background:#f6da91}@media(max-width:900px){.panel{border-width:3px}.scan{width:230px}.mayor{width:255px}.order{width:290px}}@media(max-width:600px){.cityBrand{left:7px;right:7px}.cityBrand>div{min-width:0}.cityBrand button{padding:0 7px;font-size:7px}}
+.cityShell {
+  --navy: #4b2b1b;
+  --panel: rgba(255, 241, 199, 0.96);
+  --panel2: #edd39a;
+  --border: #61391f;
+  --text: #43291b;
+  --muted: #7b624d;
+  --amber: #f4b52a;
+  --green: #3f8d3d;
+  background: #83c94f;
+  color: var(--text);
+}
+.panel,
+.cityBrand {
+  border: 4px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow:
+    0 7px 0 #8f5a2e,
+    0 12px 24px rgba(72, 61, 33, 0.2);
+  backdrop-filter: none;
+}
+.panel:before,
+.panel:after {
+  display: none;
+}
+.title {
+  border-bottom: 2px solid #d4af70;
+  font-weight: 950;
+}
+.title > span {
+  color: #78471f;
+}
+.title > b {
+  color: #b33d35;
+}
+.good {
+  color: #35883b !important;
+}
+.big {
+  color: #5a321c;
+  font-weight: 1000;
+}
+.metrics div,
+.orderMeta div,
+.inspector dl div {
+  border: 2px solid #d1ad6d;
+  border-radius: 8px;
+  background: #f4ddaa;
+}
+.cityBrand {
+  top: 14px;
+  padding: 7px;
+  border-color: #52301e;
+  background: linear-gradient(#77482b, #55311e);
+  color: white;
+}
+.cityBrand > span {
+  border: 3px solid #ffe078;
+  border-radius: 8px;
+  background: #e38b20;
+  color: #352113;
+  box-shadow: inset 0 -4px #b85c18;
+}
+.cityBrand small {
+  color: #e6c8a6;
+}
+.cityBrand button {
+  border: 2px solid #3e271a;
+  border-radius: 7px;
+  background: #f0ae28;
+  color: #3d281b;
+  font-weight: 950;
+}
+.cityBrand button:hover {
+  filter: brightness(1.08);
+}
+.scan {
+  width: 280px;
+}
+.mayor {
+  width: 330px;
+}
+.order {
+  width: 350px;
+}
+.agent {
+  border-top: 2px solid #d4af70;
+}
+.agent > span {
+  border: 2px solid #673f79;
+  border-radius: 7px;
+  background: #8c63ad;
+  color: white;
+}
+.permit {
+  border: 2px dashed #bd9560;
+  border-radius: 8px;
+  color: #725b47;
+}
+.changes {
+  border-top-color: #d4af70;
+}
+.dispatch {
+  border: 3px solid #70471f;
+  border-radius: 8px;
+  background: #d8b36d;
+  color: #73552c;
+}
+.order textarea {
+  border: 3px solid #764727;
+  border-radius: 8px;
+  background: #fff8df;
+  color: #42291b;
+}
+.policy button {
+  border: 2px solid #aa814c;
+  border-radius: 7px;
+  color: #765d42;
+}
+.policy .active {
+  border-color: #84521e;
+  background: #f4bd39;
+  color: #4b2c18;
+}
+.searchModal {
+  border: 5px solid #603921;
+  border-radius: 14px;
+  background: #fff1c7;
+  color: #43291b;
+}
+.searchModal > div,
+.searchModal > button {
+  border-bottom-color: #d5b274;
+}
+.searchModal input {
+  color: #43291b;
+}
+.gate {
+  --gate-ink: #3b281d;
+  --gate-panel: #fff1c7;
+  --gate-line: #6a4025;
+  --gate-amber: #f4b52a;
+  --gate-cream: #fff6d7;
+  --gate-mint: #4b9a45;
+  background: linear-gradient(#72cff0 0 46%, #83c94f 46% 100%);
+  color: #43291b;
+}
+.gate:before {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(67, 119, 45, 0.1) 0 1px,
+    transparent 1px 46px
+  );
+}
+.gateGrid {
+  border-color: rgba(85, 52, 29, 0.25);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 79px,
+      rgba(85, 52, 29, 0.12) 80px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 79px,
+      rgba(85, 52, 29, 0.12) 80px
+    );
+}
+.gateCard {
+  border: 5px solid #603921;
+  border-radius: 15px;
+  background: #fff1c7;
+  box-shadow:
+    0 10px 0 #936033,
+    0 24px 60px rgba(70, 64, 36, 0.28);
+}
+.gateCard h1 {
+  color: #4a2d1d;
+  text-shadow: 0 2px #fff;
+}
+.gateCopy {
+  color: #745d48;
+}
+.gateCrest {
+  border: 4px solid #603921;
+  border-radius: 10px;
+  background: #e58c22;
+  color: white;
+  box-shadow: inset 0 -6px #b85d19;
+}
+.gateSignal {
+  color: #8a511e;
+  font-weight: 950;
+}
+.gateEnter,
+.gateLoading {
+  border: 4px solid #65401f;
+  border-radius: 9px;
+  background: #f4b52a;
+  color: #3c281b;
+  box-shadow: 0 5px 0 #9b622d;
+}
+.gateRules span {
+  color: #6f5a46;
+  font-weight: 800;
+}
+.gateStatus {
+  border: 4px solid #603921;
+  border-radius: 10px;
+  background: #fff1c7;
+}
+.gateStatus strong {
+  color: #4a2d1d;
+}
+.gateStatus span {
+  color: #745d48;
+}
+.gateBrand {
+  color: #43291b;
+}
+.gateBrand small {
+  color: #5c6548;
+}
+.gateBrand > b {
+  border-color: #694127;
+  color: #5d3c26;
+  background: #f6da91;
+}
+@media (max-width: 900px) {
+  .panel {
+    border-width: 3px;
+  }
+  .scan {
+    width: 230px;
+  }
+  .mayor {
+    width: 255px;
+  }
+  .order {
+    width: 290px;
+  }
+}
+@media (max-width: 600px) {
+  .cityBrand {
+    left: 7px;
+    right: 7px;
+  }
+  .cityBrand > div {
+    min-width: 0;
+  }
+  .cityBrand button {
+    padding: 0 7px;
+    font-size: 7px;
+  }
+}
