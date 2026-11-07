@@ -1,12 +1,14 @@
 import { redirect } from "next/navigation";
 import { Code2, LogOut } from "lucide-react";
 import Image from "next/image";
+import { cookies } from "next/headers";
 import { currentUser } from "@/lib/session";
 import { reposFor, type Repo } from "@/lib/github";
 import RepoPicker from "@/features/repos/repo-picker";
 export default async function Repos() {
   const user = await currentUser();
   if (!user) redirect("/");
+  const csrf = (await cookies()).get("coc_csrf")?.value || "";
   let repos: Repo[] = [];
   let message = "";
   try {
@@ -35,6 +37,7 @@ export default async function Repos() {
           unoptimized
         />
         <form action="/api/auth/logout" method="post">
+          <input type="hidden" name="csrf" value={csrf} />
           <button className="ui-button ui-ghost" aria-label="Log out">
             <LogOut size={15} />
           </button>

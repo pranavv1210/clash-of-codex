@@ -56,7 +56,11 @@ export default function RepoPicker({ initial }: { initial: Repo[] }) {
     setError("");
     const res = await fetch("/api/repos/select", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-csrf-token":
+          document.cookie.match(/(?:^|; )coc_csrf=([^;]+)/)?.[1] || "",
+      },
       body: JSON.stringify(repo),
     });
     const data = await res.json();

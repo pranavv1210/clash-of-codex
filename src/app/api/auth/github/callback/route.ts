@@ -4,14 +4,18 @@ import { serverEnv } from "@/lib/env";
 import { encrypt } from "@/lib/crypto";
 import { db } from "@/lib/db";
 import { COOKIE, cookieOptions, createSession } from "@/lib/session";
+import { clientIp, PKCE_COOKIE, rateLimit } from "@/lib/security";
 const same = (a: string, b: string) =>
   a.length === b.length && timingSafeEqual(Buffer.from(a), Buffer.from(b));
 export async function GET(req: NextRequest) {
+  const limited = await rateLimit(`auth:callback:${clientIp(req)}`, 20, 60);
+  if (limited) return limited;
   const home = new URL("/", req.url),
     state = req.nextUrl.searchParams.get("state") || "",
     expected = req.cookies.get("coc_oauth_state")?.value || "",
-    code = req.nextUrl.searchParams.get("code");
-  if (!code || !same(state, expected)) {
+    code = req.nextUrl.searchParams.get("code"),
+    verifier = req.cookies.get(PKCE_COOKIE)?.value;
+  if (!code || !verifier || !same(state, expected)) {
     home.searchParams.set("auth", "state");
     return NextResponse.redirect(home);
   }
@@ -27,6 +31,7 @@ export async function GET(req: NextRequest) {
           client_id: env.GITHUB_CLIENT_ID,
           client_secret: env.GITHUB_CLIENT_SECRET,
           code,
+          code_verifier: verifier,
         }),
       }),
       token = (await tokenRes.json()) as {
@@ -76,6 +81,7 @@ export async function GET(req: NextRequest) {
       res = NextResponse.redirect(new URL("/repos", req.url));
     res.cookies.set(COOKIE, session, cookieOptions);
     res.cookies.delete("coc_oauth_state");
+    res.cookies.delete(PKCE_COOKIE);
     return res;
   } catch {
     home.searchParams.set("auth", "failed");

@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { currentUser } from "@/lib/session";
 import { userQuery } from "@/lib/db";
+import { clientIp, rateLimit, requireCsrf } from "@/lib/security";
 const schema = z.object({
   id: z.number(),
   fullName: z.string(),
@@ -13,10 +14,18 @@ const schema = z.object({
   language: z.string().nullable(),
   pushedAt: z.string().nullable(),
 });
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  const denied = await requireCsrf(req);
+  if (denied) return denied;
   const user = await currentUser();
   if (!user)
     return NextResponse.json({ error: "Sign in first." }, { status: 401 });
+  const limited = await rateLimit(
+    `repo:select:${user.id}:${clientIp(req)}`,
+    30,
+    60,
+  );
+  if (limited) return limited;
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success)
     return NextResponse.json({ error: "Invalid repository." }, { status: 400 });
