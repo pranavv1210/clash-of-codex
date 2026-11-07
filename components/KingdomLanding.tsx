@@ -215,6 +215,14 @@ export default function KingdomLanding() {
     setSearchOpen(false);
     setQuery("");
   }
+  function leaveCity() {
+    setRepo(null);
+    setProjects([]);
+    setFiles([]);
+    setSelectedProjectId("");
+    setSelectedFilePath("");
+    setTransmissions([]);
+  }
 
   if (authLoading) return <AuthGate loading />;
   if (!viewer) return <AuthGate error={error} />;
@@ -253,6 +261,9 @@ export default function KingdomLanding() {
           <strong>CODEX CITY</strong>
           <small>SOFTWARE OPERATIONS MAP</small>
         </div>
+        <button onClick={leaveCity}>
+          <MapIcon /> VILLAGES
+        </button>
         <button onClick={() => setSearchOpen(true)} disabled={!repo}>
           <Search /> SEARCH
         </button>
