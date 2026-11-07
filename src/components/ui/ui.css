@@ -1,0 +1,128 @@
+.ui-button {
+  height: var(--control);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  font-weight: 600;
+  font-size: var(--font-13);
+  cursor: pointer;
+  transition:
+    background var(--fast) var(--enter),
+    border-color var(--fast) var(--enter);
+}
+.ui-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.ui-primary {
+  background: var(--amber);
+  color: var(--bg-0);
+}
+.ui-primary:hover {
+  background: var(--amber-hover);
+}
+.ui-secondary {
+  border-color: var(--cyan);
+  background: transparent;
+  color: var(--cyan);
+}
+.ui-ghost {
+  background: transparent;
+  color: var(--text-2);
+}
+.ui-danger {
+  background: var(--error);
+  color: var(--bg-0);
+}
+.ui-input,
+.ui-search {
+  height: var(--control);
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--bg-0);
+  color: var(--text-1);
+}
+.ui-input {
+  padding: 0 var(--space-3);
+}
+.ui-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+}
+.ui-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+}
+.ui-search:focus-within {
+  box-shadow: var(--focus);
+}
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 7px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-2);
+  font:
+    var(--font-11) var(--font-geist-mono),
+    monospace;
+}
+.ui-badge-success {
+  color: var(--success);
+}
+.ui-badge-warning {
+  color: var(--warning);
+}
+.ui-badge-error {
+  color: var(--error);
+}
+.ui-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  box-shadow:
+    inset 0 1px rgba(245, 185, 66, 0.08),
+    0 24px 64px var(--shadow);
+}
+.ui-state {
+  padding: var(--space-8);
+  text-align: center;
+}
+.ui-state p {
+  color: var(--text-2);
+}
+.ui-error {
+  border-color: var(--error);
+}
+.ui-skeleton {
+  height: 88px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(90deg, var(--bg-1), var(--bg-2), var(--bg-1));
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+.spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}

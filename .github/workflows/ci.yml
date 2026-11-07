@@ -1,23 +1,15 @@
-name: Inceptown checks
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-concurrency:
-  group: inceptown-ci-${{ github.ref }}
-  cancel-in-progress: true
-
+name: CI
+on: [push, pull_request]
 jobs:
-  verify:
+  quality:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm install --no-audit --no-fund
-      - run: npm audit --omit=dev --audit-level=high
-      - run: npm run typecheck
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
       - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run check:tokens
       - run: npm run build
