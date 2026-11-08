@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-for (const path of ["/", "/design"]) {
+test.setTimeout(60000);
+for (const path of ["/", "/design", "/showroom"]) {
   test(`axe ${path}`, async ({ page }) => {
     await page.goto(path);
     const result = await new AxeBuilder({ page })

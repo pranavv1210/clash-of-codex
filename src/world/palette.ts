@@ -1,0 +1,30 @@
+export const worldPalette = {
+  skyZenith: "#07111b",
+  skyMid: "#173c5a",
+  horizon: "#b8644f",
+  horizonGlow: "#e89a61",
+  sun: "#ffd58a",
+  fog: "#52748b",
+  rock: "#3c4650",
+  rockDark: "#202933",
+  rockLight: "#53606a",
+  strata: "#65717a",
+  grass: "#637f58",
+  paving: "#697680",
+  metal: "#263847",
+  glass: "#56cce5",
+  cyan: "#36c9e7",
+  amber: "#f5b942",
+  windows: "#ffd47c",
+  water: "#72dbef",
+  white: "#eaf1f5",
+  success: "#39d98a",
+  error: "#f06464",
+  brick: "#795a54",
+  wood: "#6d5541",
+  studio: "#ba6f8d",
+  library: "#c0a779",
+} as const;
+export type WorldStyle = "cyan" | "amber";
+export const energyColor = (style: WorldStyle) =>
+  style === "cyan" ? worldPalette.cyan : worldPalette.amber;

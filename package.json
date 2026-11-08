@@ -23,6 +23,7 @@
     "@radix-ui/react-tooltip": "^1.4.1",
     "@react-three/drei": "^10.0.0",
     "@react-three/fiber": "^9.0.0",
+    "@react-three/postprocessing": "^3.2.2",
     "@tanstack/react-query": "^5.107.1",
     "clsx": "^2.1.1",
     "dotenv": "^18.0.9",
@@ -33,12 +34,15 @@
     "pg": "^8.23.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "simplex-noise": "^4.0.3",
     "three": "^0.172.0",
+    "three-mesh-bvh": "^0.9.18",
     "zod": "^4.6.7",
     "zustand": "^5.1.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
+    "@gltf-transform/cli": "^4.5.1",
     "@playwright/test": "^1.65.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
