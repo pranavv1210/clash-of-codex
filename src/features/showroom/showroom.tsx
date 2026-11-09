@@ -34,11 +34,13 @@ export default function Showroom() {
     [perf, setPerf] = useState<Perf | null>(null),
     [ready, setReady] = useState(false),
     [showPerf, setShowPerf] = useState(true),
-    [wireframe, setWireframe] = useState(false);
+    [wireframe, setWireframe] = useState(false),
+    [panelOpen, setPanelOpen] = useState(true);
   const [mounted, setMounted] = useState(true);
   useEffect(() => {
     setTier(autoQuality(innerWidth, navigator.maxTouchPoints > 0));
     if (innerWidth <= 600) setShowPerf(false);
+    if (innerWidth <= 600) setPanelOpen(false);
   }, []);
   return (
     <main className="showroom" data-scene-ready={ready}>
@@ -53,85 +55,100 @@ export default function Showroom() {
           onReady={() => setReady(true)}
         />
       )}
-      <Panel className="showroom-panel">
-        <div className="showroom-title">
-          <span>
-            <b>Floating-island showroom</b>
-            <small>Procedural art kit · crew stand-ins</small>
-          </span>
-          <IconButton
-            label={night ? "Use dusk" : "Use night"}
-            onClick={() => setNight((v) => !v)}
+      <Panel
+        className={`showroom-panel ${panelOpen ? "is-open" : "is-collapsed"}`}
+      >
+        <Button
+          variant="ghost"
+          className="sheet-handle"
+          onClick={() => setPanelOpen((value) => !value)}
+        >
+          <span /> {panelOpen ? "Hide controls" : "Show controls"}
+        </Button>
+        <div className="panel-content">
+          <div className="showroom-title">
+            <span>
+              <b>Floating-island showroom</b>
+              <small>Procedural art kit · crew stand-ins</small>
+            </span>
+            <IconButton
+              label={night ? "Use dusk" : "Use night"}
+              onClick={() => setNight((v) => !v)}
+            >
+              {night ? <Sun size={15} /> : <Moon size={15} />}
+            </IconButton>
+          </div>
+          <label className="label">Camera preset</label>
+          <div className="preset-grid">
+            {(
+              [
+                "far",
+                "mid",
+                "close",
+                "under",
+                "rim",
+                "waterfall",
+                "crystal",
+                "top",
+                "night",
+                "street",
+                "sky",
+              ] as CameraPreset[]
+            ).map((p) => (
+              <Button
+                key={p}
+                variant={preset === p ? "primary" : "ghost"}
+                onClick={() => {
+                  setPreset(p);
+                  if (p === "night") setNight(true);
+                }}
+              >
+                {p}
+              </Button>
+            ))}
+          </div>
+          <label className="label">Render quality</label>
+          <Select
+            aria-label="Render quality"
+            value={tier}
+            onChange={(e) => setTier(e.target.value as QualityTier)}
           >
-            {night ? <Sun size={15} /> : <Moon size={15} />}
-          </IconButton>
-        </div>
-        <label className="label">Camera preset</label>
-        <div className="preset-grid">
-          {(
-            [
-              "far",
-              "mid",
-              "close",
-              "under",
-              "rim",
-              "waterfall",
-              "crystal",
-              "top",
-              "night",
-            ] as CameraPreset[]
-          ).map((p) => (
+            {["low", "medium", "high", "ultra"].map((q) => (
+              <option key={q}>{q}</option>
+            ))}
+          </Select>
+          <div className="dusk-badge">
+            Dusk palette · cyan energy · amber light
+          </div>
+          <label className="label">World seed</label>
+          <div className="seed-row">
+            <input
+              className="ui-input"
+              aria-label="World seed"
+              value={seedInput}
+              onChange={(e) => setSeedInput(e.target.value)}
+            />
+            <IconButton label="Regenerate" onClick={() => setSeed(seedInput)}>
+              <RefreshCw size={15} />
+            </IconButton>
+          </div>
+          <div className="style-row">
+            <Button variant="ghost" onClick={() => setShowPerf((v) => !v)}>
+              <Gauge size={14} /> Perf
+            </Button>
+            <Button variant="ghost" onClick={() => setWireframe((v) => !v)}>
+              <Grid3X3 size={14} /> Wireframe
+            </Button>
             <Button
-              key={p}
-              variant={preset === p ? "primary" : "ghost"}
+              variant="ghost"
               onClick={() => {
-                setPreset(p);
-                if (p === "night") setNight(true);
+                setMounted((value) => !value);
+                setReady(false);
               }}
             >
-              {p}
+              {mounted ? "Unmount" : "Mount"}
             </Button>
-          ))}
-        </div>
-        <label className="label">Render quality</label>
-        <Select
-          aria-label="Render quality"
-          value={tier}
-          onChange={(e) => setTier(e.target.value as QualityTier)}
-        >
-          {["low", "medium", "high", "ultra"].map((q) => (
-            <option key={q}>{q}</option>
-          ))}
-        </Select>
-        <div className="dusk-badge">Dusk world palette</div>
-        <label className="label">World seed</label>
-        <div className="seed-row">
-          <input
-            className="ui-input"
-            aria-label="World seed"
-            value={seedInput}
-            onChange={(e) => setSeedInput(e.target.value)}
-          />
-          <IconButton label="Regenerate" onClick={() => setSeed(seedInput)}>
-            <RefreshCw size={15} />
-          </IconButton>
-        </div>
-        <div className="style-row">
-          <Button variant="ghost" onClick={() => setShowPerf((v) => !v)}>
-            <Gauge size={14} /> Perf
-          </Button>
-          <Button variant="ghost" onClick={() => setWireframe((v) => !v)}>
-            <Grid3X3 size={14} /> Wireframe
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => {
-              setMounted((value) => !value);
-              setReady(false);
-            }}
-          >
-            {mounted ? "Unmount" : "Mount"}
-          </Button>
+          </div>
         </div>
       </Panel>
       {showPerf && perf && (

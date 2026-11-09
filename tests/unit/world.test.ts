@@ -1,9 +1,39 @@
 import { describe, expect, it } from "vitest";
 import { createRng, seededRange } from "../../src/world/rng";
 import { createIslandPlan, planHash } from "../../src/world/islands/model";
-import { buildingSpec } from "../../src/world/buildings/model";
+import {
+  buildingFitsPad,
+  buildingSpec,
+  type Archetype,
+} from "../../src/world/buildings/model";
 import { createCliffGeometry } from "../../src/world/islands/cliffGeometry";
+import { showroomComposition } from "../../src/world/composition";
 describe("procedural world", () => {
+  it("keeps all archetypes inside the pad with rim clearance", () => {
+    const archetypes: Archetype[] = [
+      "hq",
+      "dev",
+      "comms",
+      "data",
+      "test",
+      "library",
+      "control",
+      "studio",
+      "workshop",
+      "home",
+      "grid",
+    ];
+    for (const archetype of archetypes)
+      expect(buildingFitsPad(archetype, `${archetype}:bounds`, 8)).toBe(true);
+  });
+  it("keeps the hero composition centers separated", () => {
+    const points = [showroomComposition.hero, ...showroomComposition.orbit];
+    for (let a = 0; a < points.length; a++)
+      for (let b = a + 1; b < points.length; b++)
+        expect(
+          Math.hypot(points[a][0] - points[b][0], points[a][2] - points[b][2]),
+        ).toBeGreaterThan(20);
+  });
   it("repeats seeded random sequences", () => {
     expect(seededRange("city", 12)).toEqual(seededRange("city", 12));
     const a = createRng("a"),

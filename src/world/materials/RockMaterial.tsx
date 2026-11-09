@@ -94,7 +94,7 @@ export type SurfaceKind =
   "grass" | "paved" | "garden" | "tech" | "stone" | "soil";
 const surfaceAssets: Record<SurfaceKind, string> = {
   grass: "leafy_grass",
-  paved: "concrete_pavement",
+  paved: "concrete_wall_007",
   garden: "brown_mud_02",
   tech: "metal_plate",
   stone: "concrete_wall_007",

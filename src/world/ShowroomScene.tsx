@@ -16,6 +16,7 @@ import { CityCamera, type CameraPreset } from "./camera/CityCamera";
 import { PerfMonitor, type PerfSample } from "./perf/PerfMonitor";
 import { qualityTiers, type QualityTier } from "./quality/tiers";
 import { worldPalette } from "./palette";
+import { showroomComposition } from "./composition";
 type Props = {
   seed: string;
   night: boolean;
@@ -27,7 +28,7 @@ type Props = {
 };
 const islands = [
   {
-    p: [0, 0, 0],
+    p: showroomComposition.hero,
     size: "HQ",
     theme: "paved",
     buildings: [
@@ -37,7 +38,7 @@ const islands = [
     ],
   },
   {
-    p: [-18, 1, -8],
+    p: showroomComposition.orbit[0],
     size: "M",
     theme: "grass",
     buildings: [
@@ -47,7 +48,7 @@ const islands = [
     ],
   },
   {
-    p: [19, -1, -7],
+    p: showroomComposition.orbit[1],
     size: "M",
     theme: "tech",
     buildings: [
@@ -57,7 +58,7 @@ const islands = [
     ],
   },
   {
-    p: [-15, -2, 14],
+    p: showroomComposition.orbit[2],
     size: "M",
     theme: "garden",
     buildings: [
@@ -66,7 +67,7 @@ const islands = [
     ],
   },
   {
-    p: [16, 1, 15],
+    p: showroomComposition.orbit[3],
     size: "M",
     theme: "paved",
     buildings: [
@@ -74,8 +75,13 @@ const islands = [
       ["test", -3, 2],
     ],
   },
-  { p: [0, -3, 25], size: "S", theme: "stone", buildings: [["grid", 0, 0]] },
-  { p: [38, 0, 26], size: "M", theme: "grass", buildings: [] },
+  {
+    p: showroomComposition.orbit[4],
+    size: "S",
+    theme: "stone",
+    buildings: [["grid", 0, 0]],
+  },
+  { p: showroomComposition.distant, size: "M", theme: "grass", buildings: [] },
 ] as const;
 function Wireframe({ enabled }: { enabled: boolean }) {
   const scene = useThree((state) => state.scene);
@@ -167,7 +173,7 @@ export default function ShowroomScene(props: Props) {
                     archetype={b[0]}
                     seed={`${props.seed}-${i}-${j}`}
                     night={props.night}
-                    simplified={props.tier !== "ultra"}
+                    simplified={props.tier === "low"}
                   />
                 </group>
               ))}
@@ -190,7 +196,7 @@ export default function ShowroomScene(props: Props) {
                       position={[-3 + j * 1.4, 0, 4]}
                     />
                   ))}
-              {props.tier !== "low" && (
+              {props.tier !== "low" && (i === 0 || props.tier === "ultra") && (
                 <group position={[6, 0, 0]} name="category:crystals">
                   <CrystalCluster scale={0.75} />
                 </group>
@@ -204,15 +210,15 @@ export default function ShowroomScene(props: Props) {
         ))}
         {props.tier !== "low" && (
           <group name="category:links">
-            <Bridge start={[-10, 0.6, 0]} end={[-12, 0.6, -6]} />
-            <Bridge start={[10, 0.6, 2]} end={[13, 0.6, 11]} />
+            <Bridge start={[-11, 4.6, -3]} end={[-22, 1.6, -9]} />
+            <Bridge start={[11, 4.6, -4]} end={[23, -0.4, -10]} />
           </group>
         )}
         {props.tier !== "low" && (
-          <Monorail start={[-10, 1, 4]} end={[-11, 1, 12]} />
+          <Monorail start={[-10, 4.8, 5]} end={[-19, -2.2, 20]} />
         )}
         {props.tier !== "low" && (
-          <SkyLift start={[10, 5, -2]} end={[14, 4, -6]} />
+          <SkyLift start={[10, 8, 3]} end={[22, 4, 20]} />
         )}
         {props.tier !== "low" && <Airship />}
         {props.tier !== "low" && <CargoDrone />}

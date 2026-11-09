@@ -15,10 +15,22 @@
   left: var(--space-4);
   top: var(--space-4);
   z-index: 5;
-  width: 296px;
+  width: 320px;
+  box-sizing: border-box;
+  max-height: calc(100vh - var(--space-5));
+  overflow: auto;
   padding: var(--space-4);
   display: grid;
   gap: var(--space-3);
+}
+.panel-content {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.panel-content > * { min-width: 0; max-width: 100%; box-sizing: border-box; }
+.sheet-handle {
+  display: none;
 }
 .showroom-title {
   display: flex;
@@ -31,6 +43,7 @@
 .showroom-title b,
 .showroom-title small {
   display: block;
+  overflow-wrap: anywhere;
 }
 .showroom-title small {
   margin-top: var(--space-1);
@@ -43,18 +56,22 @@
   gap: var(--space-1);
 }
 .preset-grid .ui-button {
+  min-width: 0;
+  width: 100%;
   padding: 0 var(--space-2);
   text-transform: capitalize;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .style-row,
 .seed-row {
   display: flex;
   gap: var(--space-2);
 }
+.style-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.style-row .ui-button { min-width: 0; padding-inline: var(--space-1); overflow: hidden; }
 .dusk-badge {
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-control);
+  padding: 0;
   color: var(--cyan);
   font:
     var(--font-11) var(--font-geist-mono),
@@ -117,15 +134,38 @@
     top: auto;
     bottom: var(--space-2);
     width: auto;
-    max-height: 286px;
+    max-height: min(72vh, 560px);
+    overflow: hidden;
+    padding: var(--space-2) var(--space-3)
+      max(var(--space-3), env(safe-area-inset-bottom));
+    transition: max-height 250ms var(--ease-enter);
+  }
+  .showroom-panel.is-collapsed {
+    max-height: 58px;
+  }
+  .showroom-panel .panel-content {
     overflow: auto;
-    padding: var(--space-3);
+    padding-top: var(--space-2);
+  }
+  .showroom-panel.is-collapsed .panel-content {
+    display: none;
+  }
+  .sheet-handle {
+    display: flex;
+    width: 100%;
+    min-height: 44px;
+  }
+  .sheet-handle span {
+    width: 36px;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--text-3);
   }
   .showroom-panel .label {
     display: none;
   }
   .preset-grid {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .preset-grid .ui-button {
     min-width: 0;

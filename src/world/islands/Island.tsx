@@ -64,9 +64,6 @@ export function Island({
       <mesh geometry={cliff} castShadow receiveShadow>
         <RockMaterial />
       </mesh>
-      {tier !== "low" && (
-        <RimWall radius={plan.radius} posts={tier === "ultra"} />
-      )}
       {tier === "ultra" && <Roots seed={seed} radius={plan.radius} />}
       {tier === "ultra" &&
         Array.from({ length: 7 }, (_, i) => {
@@ -111,37 +108,6 @@ export function Island({
         })}
       {tier !== "low" && size !== "S" && <Waterfall radius={plan.radius} />}
       <group position={[0, 0.3, 0]}>{children}</group>
-    </group>
-  );
-}
-function RimWall({ radius, posts }: { radius: number; posts: boolean }) {
-  return (
-    <group position={[0, 0.62, 0]}>
-      <mesh rotation={[Math.PI / 2, 0, 0]} receiveShadow>
-        <torusGeometry args={[radius * 0.72, 0.13, 8, 64]} />
-        <meshStandardMaterial color={worldPalette.paving} roughness={0.86} />
-      </mesh>
-      {posts &&
-        Array.from({ length: 12 }, (_, i) => {
-          const angle = (i / 12) * Math.PI * 2;
-          return (
-            <mesh
-              key={i}
-              position={[
-                Math.cos(angle) * radius * 0.72,
-                0.36,
-                Math.sin(angle) * radius * 0.72,
-              ]}
-            >
-              <cylinderGeometry args={[0.035, 0.045, 0.72, 7]} />
-              <meshStandardMaterial
-                color={worldPalette.metal}
-                metalness={0.55}
-                roughness={0.5}
-              />
-            </mesh>
-          );
-        })}
     </group>
   );
 }

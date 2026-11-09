@@ -12,24 +12,30 @@ export type CameraPreset =
   | "under"
   | "rim"
   | "waterfall"
-  | "crystal";
+  | "crystal"
+  | "street"
+  | "sky";
 const presets: Record<CameraPreset, [number, number, number]> = {
-  far: [48, 22, 52],
-  mid: [25, 12, 28],
-  close: [56, 3.5, 43],
+  far: [72, 38, 78],
+  mid: [31, 18, 34],
+  close: [18, 10, 20],
   top: [0.1, 62, 0.1],
-  night: [38, 17, 43],
+  night: [58, 27, 64],
   under: [56, -9, 44],
   rim: [55, 4.2, 42],
   waterfall: [51, -1, 39],
   crystal: [50, 4.2, 34],
+  street: [18, 6.2, 20],
+  sky: [42, 10, 66],
 };
 const targets: Partial<Record<CameraPreset, [number, number, number]>> = {
   under: [38, -2.8, 26],
-  close: [44.3, -1.2, 30.5],
+  close: [0, 5, 0],
   rim: [44.3, 0.2, 30.5],
   waterfall: [42.9, -2.3, 30.1],
   crystal: [44, 1.15, 26],
+  street: [0, 5, 0],
+  sky: [0, 7, 0],
 };
 export function CityCamera({ preset }: { preset: CameraPreset }) {
   const { camera, size } = useThree();

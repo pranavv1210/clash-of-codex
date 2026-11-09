@@ -105,9 +105,10 @@ export function Sky({ night = false }: { night?: boolean }) {
                 night ? worldPalette.skyMid : worldPalette.horizon,
               ),
             },
+            glow: { value: new THREE.Color(worldPalette.horizonGlow) },
           }}
           vertexShader={`varying vec3 p;void main(){p=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`}
-          fragmentShader={`varying vec3 p;uniform vec3 top;uniform vec3 mid;uniform vec3 horizon;void main(){float h=normalize(p).y;vec3 c=mix(horizon,mid,smoothstep(-.04,.10,h));c=mix(c,top,smoothstep(.10,.55,h));gl_FragColor=vec4(c,1.);}`}
+          fragmentShader={`varying vec3 p;uniform vec3 top;uniform vec3 mid;uniform vec3 horizon;uniform vec3 glow;void main(){float h=normalize(p).y;vec3 c=mix(horizon,mid,smoothstep(-.02,.16,h));c=mix(c,top,smoothstep(.18,.72,h));float band=exp(-pow((h-.015)*18.,2.));c=mix(c,glow,band*.46);gl_FragColor=vec4(c,1.);}`}
         />
       </mesh>
       <Instances kind="stars" count={night ? 140 : 55} night={night} />

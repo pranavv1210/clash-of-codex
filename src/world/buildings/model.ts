@@ -25,3 +25,15 @@ export function buildingSpec(archetype: Archetype, seed: string) {
     roof: r() > 0.5 ? "stepped" : ("flat" as "stepped" | "flat"),
   };
 }
+export function buildingFitsPad(
+  archetype: Archetype,
+  seed: string,
+  padRadius: number,
+) {
+  const spec = buildingSpec(archetype, seed);
+  const halfDiagonal = Math.hypot(spec.width + 0.8, spec.depth + 0.8) / 2;
+  return (
+    halfDiagonal <= padRadius - 3 &&
+    spec.width * spec.depth <= Math.PI * padRadius * padRadius * 0.65
+  );
+}

@@ -17,6 +17,7 @@ export function Button({
   variant = "primary",
   loading,
   children,
+  className,
   ...p
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "secondary" | "ghost" | "danger";
@@ -24,7 +25,7 @@ export function Button({
 }) {
   return (
     <button
-      className={clsx("ui-button", `ui-${variant}`)}
+      className={clsx("ui-button", `ui-${variant}`, className)}
       disabled={loading || p.disabled}
       {...p}
     >

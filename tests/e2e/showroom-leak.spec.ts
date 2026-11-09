@@ -16,7 +16,9 @@ test("renderer resources remain stable across ten showroom mounts", async ({
   await page.goto("/showroom");
   // Three/Drei intentionally retain shader, KTX2 and PMREM initialization caches.
   // Warm them once, then require an exact resource baseline for all measured cycles.
-  await expect(page.locator('[data-scene-ready="true"]')).toBeVisible({ timeout: 90000 });
+  await expect(page.locator('[data-scene-ready="true"]')).toBeVisible({
+    timeout: 90000,
+  });
   await page.getByRole("button", { name: "Unmount", exact: true }).click();
   await expect(page.locator("canvas")).toHaveCount(0);
   for (let index = 0; index < 10; index++) {
