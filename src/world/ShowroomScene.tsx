@@ -15,10 +15,9 @@ import { Lighting } from "./lighting/Lighting";
 import { CityCamera, type CameraPreset } from "./camera/CityCamera";
 import { PerfMonitor, type PerfSample } from "./perf/PerfMonitor";
 import { qualityTiers, type QualityTier } from "./quality/tiers";
-import { worldPalette, type WorldStyle } from "./palette";
+import { worldPalette } from "./palette";
 type Props = {
   seed: string;
-  style: WorldStyle;
   night: boolean;
   tier: QualityTier;
   preset: CameraPreset;
@@ -76,6 +75,7 @@ const islands = [
     ],
   },
   { p: [0, -3, 25], size: "S", theme: "stone", buildings: [["grid", 0, 0]] },
+  { p: [38, 0, 26], size: "M", theme: "grass", buildings: [] },
 ] as const;
 function Wireframe({ enabled }: { enabled: boolean }) {
   const scene = useThree((state) => state.scene);
@@ -127,14 +127,12 @@ export default function ShowroomScene(props: Props) {
               seed={`${props.seed}-${i}`}
               size={island.size}
               theme={island.theme}
-              style={props.style}
             >
               {island.buildings.map((b, j) => (
                 <group key={j} position={[b[1], 0, b[2]]}>
                   <Building
                     archetype={b[0]}
                     seed={`${props.seed}-${i}-${j}`}
-                    style={props.style}
                     night={props.night}
                   />
                 </group>
@@ -144,14 +142,16 @@ export default function ShowroomScene(props: Props) {
                 count={Math.max(3, Math.round(q.trees / islands.length))}
                 radius={island.size === "HQ" ? 10 : 6}
               />
-              {roles.slice(0, i === 0 ? 5 : 1).map((role, j) => (
+              {roles.slice(0, i === 0 ? 5 : i < 6 ? 1 : 0).map((role, j) => (
                 <CrewStandIn
                   key={role}
                   role={role}
                   position={[-3 + j * 1.4, 0, 4]}
                 />
               ))}
-              <CrystalCluster style={props.style} scale={0.75} />
+              <group position={[6, 0, 0]}>
+                <CrystalCluster scale={0.75} />
+              </group>
               <Lamp position={[4, 0, 4]} />
               <HoloSign position={[-4, 0, -4]} label="" />
             </Island>

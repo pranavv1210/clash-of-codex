@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-const roots = ["src/app", "src/components", "src/features"],
+const roots = ["src/app", "src/components", "src/features", "src/world"],
   bad = [];
 for (const root of roots) walk(root);
 function walk(dir) {
@@ -10,6 +10,7 @@ function walk(dir) {
     if (s.isDirectory()) walk(p);
     else if (
       /\.(css|tsx?)$/.test(p) &&
+      !p.endsWith(join("world", "palette.ts")) &&
       /#[0-9a-f]{3,8}\b/i.test(readFileSync(p, "utf8"))
     )
       bad.push(p);

@@ -25,6 +25,4 @@ export const worldPalette = {
   studio: "#ba6f8d",
   library: "#c0a779",
 } as const;
-export type WorldStyle = "cyan" | "amber";
-export const energyColor = (style: WorldStyle) =>
-  style === "cyan" ? worldPalette.cyan : worldPalette.amber;
+export const energyColor = worldPalette.cyan;

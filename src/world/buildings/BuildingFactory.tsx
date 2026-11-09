@@ -1,19 +1,17 @@
 import { RoundedBox } from "@react-three/drei";
 import { buildingSpec, type Archetype } from "./model";
-import { energyColor, worldPalette, type WorldStyle } from "../palette";
+import { energyColor, worldPalette } from "../palette";
 export function Building({
   archetype,
   seed,
-  style = "cyan",
   night = false,
 }: {
   archetype: Archetype;
   seed: string;
-  style?: WorldStyle;
   night?: boolean;
 }) {
   const s = buildingSpec(archetype, seed),
-    accent = energyColor(style),
+    accent = energyColor,
     base =
       archetype === "library"
         ? worldPalette.library

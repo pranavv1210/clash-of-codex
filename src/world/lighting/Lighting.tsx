@@ -15,7 +15,7 @@ export function Lighting({
     <>
       <ambientLight intensity={night ? 0.42 : 0.68} />
       <hemisphereLight
-        args={[worldPalette.skyMid, worldPalette.rockDark, night ? 0.55 : 1.15]}
+        args={[worldPalette.skyMid, worldPalette.rockDark, night ? 0.72 : 1.38]}
       />
       <directionalLight
         position={[-26, 36, 20]}
@@ -30,11 +30,10 @@ export function Lighting({
           args={[-42, 42, 42, -42, 0.1, 100]}
         />
       </directionalLight>
-      <pointLight
-        position={[20, 10, -20]}
-        color={worldPalette.cyan}
-        intensity={night ? 25 : 8}
-        distance={55}
+      <directionalLight
+        position={[24, 15, -26]}
+        intensity={night ? 0.55 : 1.15}
+        color={worldPalette.skyMid}
       />
       <Environment resolution={128}>
         <Lightformer
