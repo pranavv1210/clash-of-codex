@@ -8,7 +8,7 @@ No Supercell, Claude City, Mixamo or unlicensed assets are used.
 
 ## Phase 2B CC0 texture sets
 
-Downloaded 2026-11-08 from Poly Haven. Poly Haven publishes these assets under CC0. Each set is stored as 1K Basis Universal KTX2 with generated mipmaps; diffuse, OpenGL normal, roughness and AO maps are included.
+Downloaded 2026-11-08 from Poly Haven. Poly Haven publishes these assets under CC0. Each set is stored as 1K Basis Universal KTX2 with generated mipmaps; diffuse, OpenGL normal, roughness and AO maps are included. The Phase 2B-Fix pipeline also reproducibly packs AO into R, roughness into G and metalness into B (zero for non-metals) as an ORM KTX2 for every set.
 
 | Asset              | Author(s)                                        | Source                                     | Used for                      |
 | ------------------ | ------------------------------------------------ | ------------------------------------------ | ----------------------------- |
@@ -22,4 +22,4 @@ Downloaded 2026-11-08 from Poly Haven. Poly Haven publishes these assets under C
 | Medieval Red Brick | Rob Tuytel                                       | https://polyhaven.com/a/medieval_red_brick | retained building-kit source  |
 | Weathered Planks   | Dario Barresi, Dimitrios Savva                   | https://polyhaven.com/a/weathered_planks   | retained wood/bridge source   |
 
-The committed KTX2 payload is 5,399,679 bytes. Estimated decoded GPU memory for all 36 1K RGBA mipmapped maps would be about 192 MiB if all were resident simultaneously, so the showroom intentionally loads only the seven diffuse maps it uses (about 37.3 MiB decoded with mipmaps). This stays below the 64 MiB mobile-low texture budget; unused source sets remain available for later material passes but are not loaded.
+The committed 45-file KTX2 payload is 6,339,043 bytes, including 939,364 bytes of packed ORM files. Renderer measurements report 24 resident texture objects on Low and 43 on High. `renderer.info` does not expose driver allocation bytes; at the Basis/ETC-family 4-bpp mipmapped footprint those counts are approximately 16 MiB and 28.7 MiB respectively, while a pessimistic uncompressed RGBA footprint would be about 128 MiB and 229 MiB. The real object counts and exact committed bytes are reported separately from these format-dependent estimates rather than presented as driver-reported memory.

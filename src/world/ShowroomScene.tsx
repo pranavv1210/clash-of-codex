@@ -113,57 +113,110 @@ export default function ShowroomScene(props: Props) {
     ];
   return (
     <Canvas
-      shadows
+      shadows={props.tier !== "low"}
       dpr={[1, q.dpr]}
       camera={{ position: [42, 34, 48], fov: 38, near: 0.1, far: 180 }}
       gl={{ antialias: true, toneMapping: 3, outputColorSpace: "srgb" }}
+      onCreated={({ gl }) => {
+        const context = gl.getContext();
+        const create = context.createFramebuffer.bind(context);
+        const remove = context.deleteFramebuffer.bind(context);
+        const active = new Set<WebGLFramebuffer>();
+        context.createFramebuffer = () => {
+          const framebuffer = create();
+          if (framebuffer) active.add(framebuffer);
+          (
+            window as typeof window & { __RENDER_TARGET_COUNT__?: number }
+          ).__RENDER_TARGET_COUNT__ = active.size;
+          return framebuffer;
+        };
+        context.deleteFramebuffer = (framebuffer) => {
+          if (framebuffer) active.delete(framebuffer);
+          (
+            window as typeof window & { __RENDER_TARGET_COUNT__?: number }
+          ).__RENDER_TARGET_COUNT__ = active.size;
+          return remove(framebuffer);
+        };
+        (
+          window as typeof window & { __RENDER_TARGET_COUNT__?: number }
+        ).__RENDER_TARGET_COUNT__ = 0;
+      }}
     >
       <Suspense fallback={null}>
         <Sky night={props.night} />
         <Lighting night={props.night} tier={props.tier} />
         {islands.map((island, i) => (
-          <group key={i} position={island.p as [number, number, number]}>
+          <group
+            key={i}
+            position={island.p as [number, number, number]}
+            name="category:islands"
+          >
             <Island
               seed={`${props.seed}-${i}`}
               size={island.size}
               theme={island.theme}
+              tier={props.tier}
             >
               {island.buildings.map((b, j) => (
-                <group key={j} position={[b[1], 0, b[2]]}>
+                <group
+                  key={j}
+                  position={[b[1], 0, b[2]]}
+                  name="category:buildings"
+                >
                   <Building
                     archetype={b[0]}
                     seed={`${props.seed}-${i}-${j}`}
                     night={props.night}
+                    simplified={props.tier !== "ultra"}
                   />
                 </group>
               ))}
-              <Nature
-                seed={`${props.seed}-nature-${i}`}
-                count={Math.max(3, Math.round(q.trees / islands.length))}
-                radius={island.size === "HQ" ? 10 : 6}
-              />
-              {roles.slice(0, i === 0 ? 5 : i < 6 ? 1 : 0).map((role, j) => (
-                <CrewStandIn
-                  key={role}
-                  role={role}
-                  position={[-3 + j * 1.4, 0, 4]}
-                />
-              ))}
-              <group position={[6, 0, 0]}>
-                <CrystalCluster scale={0.75} />
-              </group>
-              <Lamp position={[4, 0, 4]} />
-              <HoloSign position={[-4, 0, -4]} label="" />
+              {props.tier === "ultra" && (
+                <group name="category:nature">
+                  <Nature
+                    seed={`${props.seed}-nature-${i}`}
+                    count={Math.max(3, Math.round(q.trees / islands.length))}
+                    radius={island.size === "HQ" ? 10 : 6}
+                  />
+                </group>
+              )}
+              {props.tier === "ultra" &&
+                roles
+                  .slice(0, i === 0 ? 5 : i < 6 ? 1 : 0)
+                  .map((role, j) => (
+                    <CrewStandIn
+                      key={role}
+                      role={role}
+                      position={[-3 + j * 1.4, 0, 4]}
+                    />
+                  ))}
+              {props.tier !== "low" && (
+                <group position={[6, 0, 0]} name="category:crystals">
+                  <CrystalCluster scale={0.75} />
+                </group>
+              )}
+              {props.tier === "ultra" && <Lamp position={[4, 0, 4]} />}
+              {props.tier === "ultra" && (
+                <HoloSign position={[-4, 0, -4]} label="" />
+              )}
             </Island>
           </group>
         ))}
-        <Bridge start={[-10, 0.6, 0]} end={[-12, 0.6, -6]} />
-        <Bridge start={[10, 0.6, 2]} end={[13, 0.6, 11]} />
-        <Monorail start={[-10, 1, 4]} end={[-11, 1, 12]} />
-        <SkyLift start={[10, 5, -2]} end={[14, 4, -6]} />
-        <Airship />
-        <CargoDrone />
-        <CargoDrone offset={2.5} />
+        {props.tier !== "low" && (
+          <group name="category:links">
+            <Bridge start={[-10, 0.6, 0]} end={[-12, 0.6, -6]} />
+            <Bridge start={[10, 0.6, 2]} end={[13, 0.6, 11]} />
+          </group>
+        )}
+        {props.tier !== "low" && (
+          <Monorail start={[-10, 1, 4]} end={[-11, 1, 12]} />
+        )}
+        {props.tier !== "low" && (
+          <SkyLift start={[10, 5, -2]} end={[14, 4, -6]} />
+        )}
+        {props.tier !== "low" && <Airship />}
+        {props.tier !== "low" && <CargoDrone />}
+        {props.tier !== "low" && <CargoDrone offset={2.5} />}
         <CityCamera preset={props.preset} />
         <PerfMonitor onSample={props.onPerf} />
         <Wireframe enabled={props.wireframe} />

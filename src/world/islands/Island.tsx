@@ -7,16 +7,19 @@ import { createRng } from "../rng";
 import { energyColor, worldPalette } from "../palette";
 import { RockMaterial, SurfaceMaterial } from "../materials/RockMaterial";
 import { createCliffGeometry } from "./cliffGeometry";
+import type { QualityTier } from "../quality/tiers";
 export function Island({
   seed,
   size = "M",
   theme = "grass",
   children,
+  tier = "high",
 }: {
   seed: string;
   size?: IslandSize;
   theme?: IslandTheme;
   children?: React.ReactNode;
+  tier?: QualityTier;
 }) {
   const plan = useMemo(() => createIslandPlan(seed, size), [seed, size]),
     shape = useMemo(() => {
@@ -61,76 +64,84 @@ export function Island({
       <mesh geometry={cliff} castShadow receiveShadow>
         <RockMaterial />
       </mesh>
-      <RimWall radius={plan.radius} />
-      <Roots seed={seed} radius={plan.radius} />
-      {Array.from({ length: 7 }, (_, i) => {
-        const a = rng() * Math.PI * 2,
-          r = plan.radius * (0.65 + rng() * 0.45);
-        return (
-          <group
-            key={i}
-            position={[Math.cos(a) * r, -1.4 - rng() * 2, Math.sin(a) * r]}
-            rotation={[rng(), a, rng()]}
-          >
-            <mesh castShadow>
-              <octahedronGeometry args={[0.25 + rng() * 0.4, 0]} />
+      {tier !== "low" && (
+        <RimWall radius={plan.radius} posts={tier === "ultra"} />
+      )}
+      {tier === "ultra" && <Roots seed={seed} radius={plan.radius} />}
+      {tier === "ultra" &&
+        Array.from({ length: 7 }, (_, i) => {
+          const a = rng() * Math.PI * 2,
+            r = plan.radius * (0.65 + rng() * 0.45);
+          return (
+            <group
+              key={i}
+              position={[Math.cos(a) * r, -1.4 - rng() * 2, Math.sin(a) * r]}
+              rotation={[rng(), a, rng()]}
+            >
+              <mesh castShadow>
+                <octahedronGeometry args={[0.25 + rng() * 0.4, 0]} />
+                <meshStandardMaterial
+                  color={energyColor}
+                  emissive={energyColor}
+                  emissiveIntensity={2.1}
+                  roughness={0.22}
+                />
+              </mesh>
+            </group>
+          );
+        })}
+      {tier === "ultra" &&
+        Array.from({ length: 5 }, (_, i) => {
+          const a = rng() * Math.PI * 2,
+            r = plan.radius * (1.2 + rng() * 0.35);
+          return (
+            <mesh
+              key={`d${i}`}
+              position={[Math.cos(a) * r, -2 - rng() * 3, Math.sin(a) * r]}
+              rotation={[rng() * 2, rng() * 2, rng() * 2]}
+              castShadow
+            >
+              <dodecahedronGeometry args={[0.25 + rng() * 0.45, 0]} />
               <meshStandardMaterial
-                color={energyColor}
-                emissive={energyColor}
-                emissiveIntensity={2.1}
-                roughness={0.22}
+                color={worldPalette.rockDark}
+                roughness={1}
               />
             </mesh>
-          </group>
-        );
-      })}
-      {Array.from({ length: 5 }, (_, i) => {
-        const a = rng() * Math.PI * 2,
-          r = plan.radius * (1.2 + rng() * 0.35);
-        return (
-          <mesh
-            key={`d${i}`}
-            position={[Math.cos(a) * r, -2 - rng() * 3, Math.sin(a) * r]}
-            rotation={[rng() * 2, rng() * 2, rng() * 2]}
-            castShadow
-          >
-            <dodecahedronGeometry args={[0.25 + rng() * 0.45, 0]} />
-            <meshStandardMaterial color={worldPalette.rockDark} roughness={1} />
-          </mesh>
-        );
-      })}
-      {size !== "S" && <Waterfall radius={plan.radius} />}
+          );
+        })}
+      {tier !== "low" && size !== "S" && <Waterfall radius={plan.radius} />}
       <group position={[0, 0.3, 0]}>{children}</group>
     </group>
   );
 }
-function RimWall({ radius }: { radius: number }) {
+function RimWall({ radius, posts }: { radius: number; posts: boolean }) {
   return (
     <group position={[0, 0.62, 0]}>
       <mesh rotation={[Math.PI / 2, 0, 0]} receiveShadow>
         <torusGeometry args={[radius * 0.72, 0.13, 8, 64]} />
         <meshStandardMaterial color={worldPalette.paving} roughness={0.86} />
       </mesh>
-      {Array.from({ length: 12 }, (_, i) => {
-        const angle = (i / 12) * Math.PI * 2;
-        return (
-          <mesh
-            key={i}
-            position={[
-              Math.cos(angle) * radius * 0.72,
-              0.36,
-              Math.sin(angle) * radius * 0.72,
-            ]}
-          >
-            <cylinderGeometry args={[0.035, 0.045, 0.72, 7]} />
-            <meshStandardMaterial
-              color={worldPalette.metal}
-              metalness={0.55}
-              roughness={0.5}
-            />
-          </mesh>
-        );
-      })}
+      {posts &&
+        Array.from({ length: 12 }, (_, i) => {
+          const angle = (i / 12) * Math.PI * 2;
+          return (
+            <mesh
+              key={i}
+              position={[
+                Math.cos(angle) * radius * 0.72,
+                0.36,
+                Math.sin(angle) * radius * 0.72,
+              ]}
+            >
+              <cylinderGeometry args={[0.035, 0.045, 0.72, 7]} />
+              <meshStandardMaterial
+                color={worldPalette.metal}
+                metalness={0.55}
+                roughness={0.5}
+              />
+            </mesh>
+          );
+        })}
     </group>
   );
 }
@@ -170,7 +181,7 @@ function Waterfall({ radius }: { radius: number }) {
       rotation={[0, -0.7, 0]}
     >
       <mesh position={[0, -2.65, 0]}>
-        <planeGeometry args={[0.92, 6.1, 2, 12]} />
+        <planeGeometry args={[1.3, 6.1, 2, 12]} />
         <shaderMaterial
           ref={mat}
           uniforms={{
@@ -184,6 +195,20 @@ function Waterfall({ radius }: { radius: number }) {
           depthWrite={false}
         />
       </mesh>
+      <mesh position={[0, -2.65, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <planeGeometry args={[1.05, 6.1, 2, 12]} />
+        <shaderMaterial
+          uniforms={{
+            time: { value: 0 },
+            water: { value: new THREE.Color(worldPalette.water) },
+          }}
+          vertexShader={`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`}
+          fragmentShader={`varying vec2 vUv;uniform vec3 water;void main(){float edge=smoothstep(0.,.2,vUv.x)*smoothstep(1.,.8,vUv.x);float streak=.68+.2*sin(vUv.y*27.+vUv.x*13.);float fade=smoothstep(0.,.2,vUv.y)*smoothstep(1.,.52,vUv.y);gl_FragColor=vec4(water*streak,edge*fade*.38);}`}
+          transparent
+          side={THREE.DoubleSide}
+          depthWrite={false}
+        />
+      </mesh>
       <mesh position={[0, 0.12, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.42, 0.07, 7, 24]} />
         <meshBasicMaterial
@@ -192,23 +217,36 @@ function Waterfall({ radius }: { radius: number }) {
           opacity={0.55}
         />
       </mesh>
-      {Array.from({ length: 18 }, (_, i) => (
-        <mesh
-          key={i}
-          position={[
-            ((i % 6) - 2.5) * 0.15,
-            -5.75 + (i % 3) * 0.13,
-            (i % 4) * 0.08,
-          ]}
-        >
-          <sphereGeometry args={[0.06 + (i % 3) * 0.025, 6, 5]} />
-          <meshBasicMaterial
-            color={worldPalette.white}
-            transparent
-            opacity={0.12}
-          />
-        </mesh>
-      ))}
+      <MistInstances />
     </group>
+  );
+}
+
+function MistInstances() {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  useEffect(() => {
+    const object = new THREE.Object3D();
+    for (let i = 0; i < 18; i++) {
+      object.position.set(
+        ((i % 6) - 2.5) * 0.15,
+        -5.75 + (i % 3) * 0.13,
+        (i % 4) * 0.08,
+      );
+      object.scale.setScalar(0.06 + (i % 3) * 0.025);
+      object.updateMatrix();
+      ref.current?.setMatrixAt(i, object.matrix);
+    }
+    if (ref.current) ref.current.instanceMatrix.needsUpdate = true;
+  }, []);
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, 18]}>
+      <sphereGeometry args={[1, 6, 5]} />
+      <meshBasicMaterial
+        color={worldPalette.white}
+        transparent
+        opacity={0.12}
+        depthWrite={false}
+      />
+    </instancedMesh>
   );
 }

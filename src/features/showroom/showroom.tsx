@@ -21,6 +21,9 @@ type Perf = {
   geometries: number;
   textures: number;
   materials: number;
+  programs: number;
+  renderTargets: number;
+  categories: Record<string, number>;
 };
 export default function Showroom() {
   const [seedInput, setSeedInput] = useState("codex-archipelago"),
@@ -140,6 +143,7 @@ export default function Showroom() {
           <span>{perf.geometries} geo</span>
           <span>{perf.textures} tex</span>
           <span>{perf.materials} mat</span>
+          <span>{perf.programs} programs</span>
         </div>
       )}
       <div className="showroom-hint">

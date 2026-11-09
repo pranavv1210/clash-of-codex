@@ -3,12 +3,13 @@ import { createRng } from "../rng";
 
 export function createCliffGeometry(seed: string, radius: number) {
   const rng = createRng(`${seed}:cliff`);
-  const segments = 42;
+  const segments = 64;
   const heights = [-0.55, -1.05, -1.8, -2.75, -4.05, -5.45, -6.35];
   const radii = [1, 1.04, 0.88, 0.78, 0.56, 0.3, 0.035];
   const phaseA = rng() * Math.PI * 2;
   const phaseB = rng() * Math.PI * 2;
   const positions: number[] = [];
+  const colors: number[] = [];
   for (let ring = 0; ring < heights.length; ring++) {
     for (let i = 0; i < segments; i++) {
       const angle = (i / segments) * Math.PI * 2;
@@ -21,6 +22,11 @@ export function createCliffGeometry(seed: string, radius: number) {
       const y =
         heights[ring] + Math.sin(angle * 7 + phaseB) * 0.08 * (ring + 1);
       positions.push(Math.cos(angle) * r, y, Math.sin(angle) * r);
+      const cavity = Math.max(
+        0.48,
+        1 - Math.abs(ridge + chip) * 1.8 - ring * 0.035,
+      );
+      colors.push(cavity, cavity, cavity);
     }
   }
   const indices: number[] = [];
@@ -40,6 +46,7 @@ export function createCliffGeometry(seed: string, radius: number) {
     new THREE.Float32BufferAttribute(positions, 3),
   );
   geometry.setIndex(indices);
+  geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();
   return geometry;

@@ -5,10 +5,12 @@ export function Building({
   archetype,
   seed,
   night = false,
+  simplified = false,
 }: {
   archetype: Archetype;
   seed: string;
   night?: boolean;
+  simplified?: boolean;
 }) {
   const s = buildingSpec(archetype, seed),
     accent = energyColor,
@@ -20,6 +22,26 @@ export function Building({
           : archetype === "workshop"
             ? worldPalette.brick
             : worldPalette.metal;
+  if (simplified)
+    return (
+      <group>
+        <mesh position={[0, s.height / 2, 0]} castShadow receiveShadow>
+          <boxGeometry args={[s.width, s.height, s.depth]} />
+          <meshStandardMaterial
+            color={base}
+            roughness={0.62}
+            metalness={archetype === "data" ? 0.45 : 0.12}
+          />
+        </mesh>
+        <mesh position={[0, s.height + 0.18, 0]} castShadow>
+          <boxGeometry args={[s.width + 0.28, 0.35, s.depth + 0.28]} />
+          <meshStandardMaterial
+            color={archetype === "hq" ? accent : worldPalette.rockDark}
+            roughness={0.5}
+          />
+        </mesh>
+      </group>
+    );
   return (
     <group>
       <RoundedBox

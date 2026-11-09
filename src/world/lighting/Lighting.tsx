@@ -21,7 +21,7 @@ export function Lighting({
         position={[-26, 36, 20]}
         intensity={night ? 1.4 : 3.1}
         color={worldPalette.sun}
-        castShadow
+        castShadow={tier !== "low"}
         shadow-mapSize={[q.shadows, q.shadows]}
         shadow-bias={-0.0002}
       >
@@ -35,27 +35,31 @@ export function Lighting({
         intensity={night ? 0.55 : 1.15}
         color={worldPalette.skyMid}
       />
-      <Environment resolution={128}>
-        <Lightformer
-          intensity={2.5}
-          color={worldPalette.sun}
-          position={[-20, 20, 10]}
-          scale={[18, 18, 1]}
+      {tier !== "low" && (
+        <Environment resolution={128}>
+          <Lightformer
+            intensity={2.5}
+            color={worldPalette.sun}
+            position={[-20, 20, 10]}
+            scale={[18, 18, 1]}
+          />
+          <Lightformer
+            intensity={1.5}
+            color={worldPalette.cyan}
+            position={[20, 8, -20]}
+            scale={[15, 12, 1]}
+          />
+        </Environment>
+      )}
+      {tier === "ultra" && (
+        <ContactShadows
+          position={[0, -9, 0]}
+          scale={80}
+          opacity={0.2}
+          blur={2.5}
+          far={35}
         />
-        <Lightformer
-          intensity={1.5}
-          color={worldPalette.cyan}
-          position={[20, 8, -20]}
-          scale={[15, 12, 1]}
-        />
-      </Environment>
-      <ContactShadows
-        position={[0, -9, 0]}
-        scale={80}
-        opacity={0.2}
-        blur={2.5}
-        far={35}
-      />
+      )}
       {q.post && (
         <EffectComposer multisampling={tier === "ultra" ? 4 : 0}>
           <Bloom

@@ -41,3 +41,30 @@ The terrain is a substantial upgrade and now reads as a textured game art kit ra
 ## Measuring on a real GPU
 
 Run `npm run dev`, open `/showroom`, choose High at 1440x900 or Low at 390x844, enable Perf, wait 20 seconds without moving the camera, then orbit continuously for 30 seconds. Record the median FPS, maximum draw calls/triangles, browser GPU model from `chrome://gpu`, and repeat once after ten Mount/Unmount cycles.
+
+## Phase 2B-Fix review
+
+- Before: `docs/screenshots/phase2b-fix/before/`; iterations: `iteration-1`, `iteration-2`; accepted capture: `after/`.
+- Iteration 1 exposed a shader compile failure and absent cliff bodies. The console-error test correctly failed; those frames are retained as evidence and were not accepted.
+- Iteration 2 restored the full cliff and PBR response. Review found flat cloud ellipses and edge-on waterfalls.
+- Final added view-softened, lit cloud shading and crossed waterfall layers. Cliffs use 64-point silhouette rings, smooth vertex normals and vertex cavity color.
+- Packed PBR is active: triplanar color/normal/ORM on cliffs and color/normal/ORM on grass, soil, paving, concrete and metal surfaces.
+
+| Tier | Preset | Calls | Triangles | Texture objects | Targets |
+| ---- | ------ | ----: | --------: | --------------: | ------: |
+| Low | Far | 52 | 18,184 | 24 | 3 |
+| Low | Mid | 45 | 17,016 | 24 | 3 |
+| Low | Close | 52 | 18,184 | 24 | 3 |
+| High | Far | 219 | 49,089 | 43 | 27 |
+| High | Mid | 185 | 38,153 | 43 | 27 |
+| High | Close | 215 | 46,905 | 43 | 27 |
+
+Low removes micro-props, roots, debris, nature, transit and extra lighting passes. High retains bridges, vehicles, crystals, waterfalls, shadows, environment and post effects; Ultra retains the expensive micro-detail and contact-shadow pass.
+
+### Final verdict
+
+The failed gates from Phase 2B are closed: Low is below 150 calls, High is below 300, and ten exact remount cycles are stable for geometry, texture, material, program and framebuffer counts. The close cliff now has materially visible normal/specular variation. It remains stylized procedural terrain rather than authored AAA rock: broad source-photo variation is visible, the cloud sea is intentionally sparse, mist is sprite-like, and Ultra roots/debris still use deterministic procedural placement rather than surface-conforming splines.
+
+The leak test performs one named cache warm-up for Three/Drei's shader, KTX2 and PMREM caches, then requires exact equality across ten measured mount/unmount cycles. Final measured resources were stable; the assertion was not relaxed.
+
+Public-page verification after the fix: `/` remains 103 kB First Load JS. Three mobile Lighthouse runs scored 99/100, 99/100 and 99/100 Performance/Accessibility (median 99/100). Production client scripts contained zero matches for `WebGLRenderer`, `react-three`, `ShowroomScene` or `worldPalette`; production `/showroom` returned 404.
