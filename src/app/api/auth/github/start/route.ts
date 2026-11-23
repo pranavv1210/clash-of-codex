@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     verifier = randomToken(48),
     url = new URL("https://github.com/login/oauth/authorize");
   url.searchParams.set("client_id", env.GITHUB_CLIENT_ID);
-  url.searchParams.set("scope", "read:user user:email repo");
+  url.searchParams.set("scope", "read:user user:email public_repo");
   url.searchParams.set("state", state);
   url.searchParams.set("code_challenge", pkceChallenge(verifier));
   url.searchParams.set("code_challenge_method", "S256");
