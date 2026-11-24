@@ -100,16 +100,21 @@ export async function repositoryCityFor(userId: string, repositoryId: string) {
   );
   const api = new Octokit({ auth: token });
   const repo = selected[0];
-  const [details, tree, languageResponse] = await Promise.all([
+  const [details, branchCommit, languageResponse] = await Promise.all([
     api.rest.repos.get({ owner: repo.owner, repo: repo.name }),
-    api.rest.git.getTree({
+    api.rest.repos.getCommit({
       owner: repo.owner,
       repo: repo.name,
-      tree_sha: repo.default_branch,
-      recursive: "true",
+      ref: repo.default_branch,
     }),
     api.rest.repos.listLanguages({ owner: repo.owner, repo: repo.name }),
   ]);
+  const tree = await api.rest.git.getTree({
+    owner: repo.owner,
+    repo: repo.name,
+    tree_sha: branchCommit.data.commit.tree.sha,
+    recursive: "true",
+  });
 
   const entries = tree.data.tree.filter((entry) => entry.type === "blob" && entry.path);
   const extensionOf = (path: string) => {
