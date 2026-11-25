@@ -39,4 +39,43 @@
   --panel: rgba(11, 25, 37, 0.85);
   --shadow: rgba(0, 0, 0, 0.32);
   --focus: 0 0 0 2px var(--cyan);
+
+  /* Startup City palette */
+  --city-live-text: #8ed9b2;
+  --city-live-indicator: #64d59b;
+  --city-world-top: #0c1e2c;
+  --city-world-bottom: #0a1723;
+  --city-building-cap: #1d5363;
+  --city-building-cap-text: #a2eff8;
+  --city-building-body-start: #15394b;
+  --city-building-body-mid: #24586a;
+  --city-building-body-end: #123244;
+  --city-building-label: #d4e6ed;
+  --city-quality-cap: #4b3d2b;
+  --city-quality-cap-text: #f8cb83;
+  --city-quality-border: #b98a4a;
+  --city-quality-body-start: #382f28;
+  --city-quality-body-mid: #6c5134;
+  --city-quality-body-end: #342a25;
+  --city-knowledge-cap: #40355e;
+  --city-knowledge-cap-text: #d1b9ff;
+  --city-knowledge-border: #9b7fe1;
+  --city-knowledge-body-start: #302744;
+  --city-knowledge-body-mid: #51416e;
+  --city-knowledge-body-end: #29213b;
+  --city-intelligence-cap: #285247;
+  --city-intelligence-cap-text: #9df1c9;
+  --city-intelligence-border: #65c79d;
+  --city-intelligence-body-start: #183d38;
+  --city-intelligence-body-mid: #286453;
+  --city-intelligence-body-end: #16352f;
+  --city-operations-cap: #54402b;
+  --city-operations-cap-text: #ffd18b;
+  --city-operations-border: #c18d4c;
+  --city-operations-body-start: #3d3023;
+  --city-operations-body-mid: #665035;
+  --city-operations-body-end: #35291e;
+  --city-track: #1b3442;
+  --city-gradient-end: #7de0c2;
+  --city-notice-text: #e7c98e;
 }
